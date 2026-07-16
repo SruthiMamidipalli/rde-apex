@@ -42,6 +42,10 @@ class ApprovalService:
     def submit_for_approval(
         self, result: RetentionWorkflowResult, time_since_signal_seconds: float | None = None
     ) -> PendingApproval:
+        # Supersede any still-open approval for this customer so re-running the
+        # agent refreshes the recommendation instead of stacking duplicates.
+        self._supersede_open(result.customer_id)
+
         approval_id = f"appr_{uuid.uuid4().hex[:12]}"
         escalate = self.should_escalate(result)
         pending = PendingApproval(
@@ -67,6 +71,20 @@ class ApprovalService:
             self._log_escalation(pending)
         return pending
 
+    def _supersede_open(self, customer_id: str) -> None:
+        """Drop any still-open (pending/escalated) approval for a customer.
+
+        Decided approvals (approved/overridden) are kept so the campaign and
+        audit trail remain intact; only undecided duplicates are removed.
+        """
+        stale = [
+            aid for aid, p in self._pending.items()
+            if p.workflow_result.customer_id == customer_id
+            and p.status in (ApprovalStatus.PENDING, ApprovalStatus.ESCALATED)
+        ]
+        for aid in stale:
+            del self._pending[aid]
+
     def _log_escalation(self, pending: PendingApproval) -> None:
         decision = ApprovalDecision(
             approval_id=pending.approval_id,
@@ -79,13 +97,35 @@ class ApprovalService:
         self.audit.log_decision(decision, risk_level=pending.workflow_result.score.risk_level)
 
     # ------------------------------------------------------------------ #
+    class RoleError(Exception):
+        """Raised when a persona tries to approve a brief outside its authority."""
+
+    def _authorized_role(self, pending: PendingApproval) -> str:
+        """Which role may approve this brief: escalated → DRI, else CRM analyst."""
+        return "dri" if pending.escalated else "crm"
+
     def approve(
-        self, approval_id: str, approver: str, modifications: dict | None = None
+        self,
+        approval_id: str,
+        approver: str,
+        modifications: dict | None = None,
+        role: str | None = None,
     ) -> ApprovalDecision:
         pending = self._require(approval_id)
+        # Two-tier authority: escalated (high-value/CRITICAL) briefs are the DRI's
+        # to approve; standard briefs are the CRM analyst's. Enforce when a role
+        # is supplied (the API always supplies one).
+        required = self._authorized_role(pending)
+        if role is not None and role != required:
+            raise self.RoleError(
+                f"This brief requires {'DRI' if required == 'dri' else 'CRM Analyst'} "
+                f"approval."
+            )
         approver = approver.strip() if approver and approver.strip() else "unknown"
         status = ApprovalStatus.OVERRIDDEN if modifications else ApprovalStatus.APPROVED
         pending.status = status
+        pending.approved_by = approver
+        pending.approver_role = role or required
         decision = ApprovalDecision(
             approval_id=approval_id,
             customer_id=pending.workflow_result.customer_id,
@@ -97,8 +137,23 @@ class ApprovalService:
         self.audit.log_decision(decision, risk_level=pending.workflow_result.score.risk_level)
         return decision
 
-    def override(self, approval_id: str, approver: str, modifications: dict) -> ApprovalDecision:
-        return self.approve(approval_id, approver, modifications=modifications)
+    def override(
+        self, approval_id: str, approver: str, modifications: dict, role: str | None = None
+    ) -> ApprovalDecision:
+        return self.approve(approval_id, approver, modifications=modifications, role=role)
+
+    def send(self, approval_id: str) -> PendingApproval:
+        """Dispatch approved outreach (simulated). Only approved/overridden
+        briefs can be sent; marks the approval SENT with a timestamp + channels."""
+        pending = self._require(approval_id)
+        if pending.status not in (ApprovalStatus.APPROVED, ApprovalStatus.OVERRIDDEN):
+            raise self.RoleError("Only an approved brief can be sent.")
+        outreach = pending.workflow_result.outreach or {}
+        pending.sent_channels = [ch for ch in ("email", "sms", "push") if ch in outreach]
+        pending.sent_at = datetime.now(timezone.utc)
+        pending.status = ApprovalStatus.SENT
+        self.audit.log_send(pending)
+        return pending
 
     def escalate(self, approval_id: str, reason: str, escalated_to: str = "DRI") -> EscalationRecord:
         pending = self._require(approval_id)
@@ -156,9 +211,17 @@ class ApprovalService:
 
     def counts(self) -> dict[str, int]:
         pending = sum(1 for p in self._pending.values() if p.status == ApprovalStatus.PENDING)
-        launched = sum(
+        approved = sum(
             1 for p in self._pending.values()
             if p.status in (ApprovalStatus.APPROVED, ApprovalStatus.OVERRIDDEN)
         )
+        sent = sum(1 for p in self._pending.values() if p.status == ApprovalStatus.SENT)
         escalated = sum(1 for p in self._pending.values() if p.status == ApprovalStatus.ESCALATED)
-        return {"pending": pending, "launched": launched, "escalated": escalated}
+        # "launched" = approved-but-not-yet-sent + sent (kept for existing metrics).
+        return {
+            "pending": pending,
+            "approved": approved,
+            "sent": sent,
+            "launched": approved + sent,
+            "escalated": escalated,
+        }

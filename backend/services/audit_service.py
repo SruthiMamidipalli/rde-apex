@@ -84,6 +84,23 @@ class AuditService:
         self._persist()
         return entry.entry_id
 
+    def log_send(self, pending) -> str:
+        wf = pending.workflow_result
+        entry = AuditEntry(
+            entry_id=f"audit_{uuid.uuid4().hex[:12]}",
+            customer_id=wf.customer_id,
+            timestamp=pending.sent_at,
+            event_type="send",
+            risk_level=wf.score.risk_level,
+            approver=pending.approved_by,
+            decision=f"sent via {', '.join(pending.sent_channels)}",
+            offer_type=wf.offer.offer_type,
+            offer_value=wf.offer.value,
+        )
+        self._entries.append(entry)
+        self._persist()
+        return entry.entry_id
+
     # ------------------------------------------------------------------ #
     def query(
         self,

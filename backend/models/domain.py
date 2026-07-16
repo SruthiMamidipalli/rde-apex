@@ -227,6 +227,7 @@ class ApprovalStatus(str, Enum):
     APPROVED = "approved"
     OVERRIDDEN = "overridden"
     ESCALATED = "escalated"
+    SENT = "sent"
 
 
 class PendingApproval(BaseModel):
@@ -237,6 +238,11 @@ class PendingApproval(BaseModel):
     time_since_signal_seconds: float
     escalated: bool = False
     escalation_reason: str | None = None
+    # Who decided it (real logged-in role) and dispatch state.
+    approved_by: str | None = None
+    approver_role: str | None = None  # "crm" | "dri"
+    sent_at: datetime | None = None
+    sent_channels: list[str] = Field(default_factory=list)
 
 
 class ApprovalDecision(BaseModel):

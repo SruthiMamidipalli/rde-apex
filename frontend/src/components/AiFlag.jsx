@@ -18,29 +18,29 @@ export default function AiFlag({
 
   if (dismissed) return null;
 
-  const badge = { red: "🔴", orange: "🟠", yellow: "🟡" }[severity] || "🟠";
+  const dot = { red: "bg-apex-red", orange: "bg-apex-amber", yellow: "bg-apex-yellow" }[severity] || "bg-apex-amber";
 
   return (
-    <div className="flex animate-fade-in items-start gap-3 rounded-[10px] border border-apex-orange/30 bg-gradient-to-br from-apex-orange/[0.06] to-apex-accent/[0.06] px-4 py-3">
-      <div className="mt-0.5 shrink-0 text-[15px]">{badge}</div>
+    <div className="flex animate-fade-in items-start gap-3 rounded-2xl border border-apex-border bg-apex-surface p-5 shadow-card">
+      <div className={cn("mt-1 h-2.5 w-2.5 shrink-0 rounded-full", dot)} />
       <div className="flex-1">
-        <div className="mb-1 flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-apex-orange">
+        <div className="mb-1.5 flex items-center gap-2">
+          <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-apex-accent">
             AI Recommendation · {area}
           </span>
-          <span className="rounded-full border border-apex-border bg-apex-surface2 px-1.5 py-0.5 text-[10px] text-apex-muted">
-            Confidence {Math.round(confidence)}
+          <span className="rounded-full bg-apex-surface2 px-2 py-0.5 text-[10px] font-medium text-apex-muted">
+            {Math.round(confidence)}% confidence
           </span>
           {state && (
-            <span className="rounded-full bg-apex-green/12 px-1.5 py-0.5 text-[10px] font-semibold text-apex-green">
+            <span className="rounded-full bg-apex-green/10 px-2 py-0.5 text-[10px] font-semibold text-apex-green">
               {state === "accepted" ? "Accepted" : "Modified"} · logged to audit
             </span>
           )}
         </div>
-        <div className="text-[12.5px] leading-relaxed text-apex-text">{text}</div>
+        <div className="text-[13.5px] leading-relaxed text-apex-text">{text}</div>
         {evidence.length > 0 && (
-          <div className="mt-1.5 text-[11px] text-apex-muted">
-            Evidence:{" "}
+          <div className="mt-2 text-[11.5px] text-apex-muted">
+            Based on:{" "}
             {evidence.map((e, i) => (
               <span key={i}>
                 {e}
@@ -50,9 +50,9 @@ export default function AiFlag({
           </div>
         )}
         {!state && (
-          <div className="mt-2.5 flex gap-1.5">
+          <div className="mt-3 flex gap-2">
             <button
-              className="rounded border border-apex-green/60 bg-transparent px-3 py-1 text-[11px] font-semibold text-apex-green transition hover:bg-apex-green/10"
+              className="rounded-full bg-apex-ink px-4 py-1.5 text-[12px] font-semibold text-white transition hover:opacity-90"
               onClick={() => {
                 setState("accepted");
                 onAccept?.();
@@ -61,19 +61,19 @@ export default function AiFlag({
               {acceptLabel}
             </button>
             <button
-              className="rounded border border-apex-border bg-apex-surface2 px-3 py-1 text-[11px] font-semibold text-apex-text transition hover:bg-apex-surface3"
+              className="rounded-full border border-apex-border px-4 py-1.5 text-[12px] font-semibold text-apex-text transition hover:bg-apex-surface2"
               onClick={() => {
                 setState("modified");
                 onToast?.("Recommendation modified — feedback logged to model monitoring.");
               }}
             >
-              ✏️ Modify
+              Modify
             </button>
             <button
-              className="rounded border border-apex-border bg-apex-surface2 px-3 py-1 text-[11px] font-semibold text-apex-muted transition hover:bg-apex-surface3"
+              className="rounded-full border border-apex-border px-4 py-1.5 text-[12px] font-semibold text-apex-muted transition hover:bg-apex-surface2"
               onClick={() => setDismissed(true)}
             >
-              ✕ Dismiss
+              Dismiss
             </button>
           </div>
         )}

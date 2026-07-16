@@ -57,7 +57,7 @@ export default function Chatbot() {
       <button
         onClick={() => setOpen((o) => !o)}
         title="AI Assistant"
-        className="fixed bottom-6 right-6 z-[100] flex h-13 w-13 items-center justify-center rounded-full bg-apex-accent text-white shadow-[0_4px_20px_rgba(79,110,247,0.4)] transition hover:scale-110"
+        className="fixed bottom-6 right-6 z-[100] flex h-13 w-13 items-center justify-center rounded-full bg-brand-gradient text-white shadow-[0_4px_20px_rgba(119,69,230,0.4)] transition hover:scale-110"
         style={{ width: 52, height: 52 }}
       >
         {open ? <X size={22} /> : <MessageCircle size={22} />}
@@ -66,18 +66,18 @@ export default function Chatbot() {
       {/* Panel */}
       {open && (
         <div
-          className="fixed bottom-[90px] right-6 z-[99] flex flex-col overflow-hidden rounded-2xl border border-apex-border bg-apex-surface shadow-[0_16px_48px_rgba(0,0,0,0.6)]"
+          className="fixed bottom-[90px] right-6 z-[99] flex flex-col overflow-hidden rounded-2xl border border-apex-border bg-apex-surface shadow-pop"
           style={{ width: 380, height: 520 }}
         >
           <div className="flex items-center gap-2.5 border-b border-apex-border px-4 py-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-apex-accent to-apex-accent2 text-sm">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-apex-accent to-apex-green text-sm">
               ⬡
             </div>
             <div className="flex-1">
               <div className="text-[13px] font-bold">Apex AI Assistant</div>
               <div className="text-[10px] text-apex-muted">
                 Context: {pageContext.page}
-                {pageContext.customer_id ? ` · ${pageContext.customer_id}` : ""}
+                {pageContext.customer_name ? ` · ${pageContext.customer_name}` : ""}
               </div>
             </div>
             <button

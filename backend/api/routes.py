@@ -11,6 +11,7 @@ from models.api_models import (
     AtRiskResponse,
     ComparisonMetric,
     ComparisonResponse,
+    CostByAgent,
     CostByModel,
     CostOptimizationResponse,
     CustomerSummary,
@@ -116,8 +117,18 @@ def at_risk(threshold: float = Query(50, ge=0, le=100)):
 # --------------------------------------------------------------------------- #
 # Agent endpoints
 # --------------------------------------------------------------------------- #
+def _require_crm(role: str | None):
+    """Generating briefs is the CRM Analyst's job. DRI reviews escalations only."""
+    if role == "dri":
+        raise HTTPException(
+            403, "Generating retention briefs is the CRM Analyst's role. "
+            "As DRI you review escalated high-value briefs."
+        )
+
+
 @router.post("/agent/run/{customer_id}")
-def run_agent(customer_id: str):
+def run_agent(customer_id: str, role: str | None = Query(None)):
+    _require_crm(role)
     orch = get_orchestrator()
     result = orch.run_workflow(customer_id, submit=True)
     if result is None:
@@ -126,7 +137,8 @@ def run_agent(customer_id: str):
 
 
 @router.post("/agent/run-all")
-def run_all_triggered(threshold: float = Query(50, ge=0, le=100)):
+def run_all_triggered(threshold: float = Query(50, ge=0, le=100), role: str | None = Query(None)):
+    _require_crm(role)
     orch = get_orchestrator()
     results = orch.run_triggered_workflows(threshold)
     return {"processed": len(results), "workflow_ids": [r.workflow_id for r in results]}
@@ -147,28 +159,43 @@ def get_brief(customer_id: str):
 # --------------------------------------------------------------------------- #
 # Approval endpoints
 # --------------------------------------------------------------------------- #
+def _name_for(orch, customer_id: str) -> str:
+    """Resolve a display name; never leak the raw customer id to the UI."""
+    profile = orch.data_loader.get_customer(customer_id)
+    return profile.name if profile else "Customer"
+
+
 @router.get("/approvals/pending")
 def pending_approvals():
     orch = get_orchestrator()
-    return orch.approvals.get_pending()
+    out = []
+    for p in orch.approvals.get_pending():
+        d = p.model_dump(mode="json")
+        d["customer_name"] = _name_for(orch, p.workflow_result.customer_id)
+        out.append(d)
+    return out
 
 
 @router.post("/approvals/{approval_id}/approve")
 def approve(approval_id: str, req: ApproveRequest):
     orch = get_orchestrator()
     try:
-        return orch.approvals.approve(approval_id, req.approver)
+        return orch.approvals.approve(approval_id, req.approver, role=req.role)
     except KeyError:
         raise HTTPException(404, f"Approval '{approval_id}' not found")
+    except orch.approvals.RoleError as exc:
+        raise HTTPException(403, str(exc))
 
 
 @router.post("/approvals/{approval_id}/override")
 def override(approval_id: str, req: OverrideRequest):
     orch = get_orchestrator()
     try:
-        return orch.approvals.override(approval_id, req.approver, req.modifications)
+        return orch.approvals.override(approval_id, req.approver, req.modifications, role=req.role)
     except KeyError:
         raise HTTPException(404, f"Approval '{approval_id}' not found")
+    except orch.approvals.RoleError as exc:
+        raise HTTPException(403, str(exc))
 
 
 @router.post("/approvals/{approval_id}/escalate")
@@ -178,6 +205,25 @@ def escalate(approval_id: str, req: EscalateRequest):
         return orch.approvals.escalate(approval_id, req.reason, req.escalated_to)
     except KeyError:
         raise HTTPException(404, f"Approval '{approval_id}' not found")
+
+
+@router.post("/approvals/{approval_id}/send")
+def send_outreach(approval_id: str):
+    """Dispatch approved outreach (simulated). Marks the brief SENT."""
+    orch = get_orchestrator()
+    try:
+        pending = orch.approvals.send(approval_id)
+    except KeyError:
+        raise HTTPException(404, f"Approval '{approval_id}' not found")
+    except orch.approvals.RoleError as exc:
+        raise HTTPException(409, str(exc))
+    return {
+        "approval_id": pending.approval_id,
+        "status": pending.status.value,
+        "sent_at": pending.sent_at,
+        "sent_channels": pending.sent_channels,
+        "customer_name": _name_for(orch, pending.workflow_result.customer_id),
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -228,6 +274,7 @@ def cost_optimization():
         savings=summary["savings"],
         savings_percentage=summary["savings_percentage"],
         by_model=[CostByModel(**m) for m in summary["by_model"]],
+        by_agent=[CostByAgent(**a) for a in summary.get("by_agent", [])],
     )
 
 
@@ -306,25 +353,41 @@ def ranked_queue(threshold: float = Query(50, ge=0, le=100)):
 # --------------------------------------------------------------------------- #
 @router.get("/campaigns")
 def campaigns():
-    """Campaigns derived from decided approvals + simulated performance."""
+    """Campaigns derived from approvals. Performance is only simulated once the
+    outreach has actually been SENT — approved-but-unsent briefs are staged."""
     orch = get_orchestrator()
     out = []
     for appr in orch.approvals.all():
         wf = appr.workflow_result
         status = appr.status.value
-        # Simulate delivery/open/redeem for launched campaigns.
-        launched = status in ("approved", "overridden")
         score = wf.score.composite_score
+        sent = status == "sent"
+        approved = status in ("approved", "overridden")
+        # Human-readable stage label.
+        if sent:
+            label = "Sent"
+        elif approved:
+            label = "Ready to send"
+        elif status == "escalated":
+            label = "Awaiting DRI approval"
+        else:
+            label = "Awaiting approval"
         out.append({
             "campaign_id": appr.approval_id,
             "customer_id": wf.customer_id,
+            "customer_name": _name_for(orch, wf.customer_id),
             "offer": wf.offer.value,
             "offer_type": wf.offer.offer_type,
-            "channel": "SMS → Email" if score >= 76 else "Email",
-            "status": "Live" if launched else status.capitalize(),
-            "delivered": launched,
-            "open_rate": round(min(0.9, 0.35 + (100 - score) / 300), 2) if launched else None,
-            "redeem_rate": round(min(0.6, 0.15 + (100 - score) / 500), 2) if launched else None,
+            "channel": " → ".join(c.upper() for c in appr.sent_channels) if sent
+                       else ("SMS → Email" if score >= 76 else "Email"),
+            "status": label,
+            "sent": sent,
+            "sendable": approved,  # approved but not yet sent → show Send button
+            "sent_at": appr.sent_at,
+            "approved_by": appr.approved_by,
+            # Performance only exists after a real send.
+            "open_rate": round(min(0.9, 0.35 + (100 - score) / 300), 2) if sent else None,
+            "redeem_rate": round(min(0.6, 0.15 + (100 - score) / 500), 2) if sent else None,
             "confidence": wf.offer.confidence_score,
         })
     return {"campaigns": out, "count": len(out)}
@@ -352,7 +415,12 @@ def admin_audit(limit: int = Query(100, ge=1, le=1000)):
     orch = get_orchestrator()
     entries = orch.audit.all_entries()
     entries = sorted(entries, key=lambda e: e.timestamp, reverse=True)[:limit]
-    return {"entries": entries, "count": len(entries)}
+    out = []
+    for e in entries:
+        d = e.model_dump(mode="json")
+        d["customer_name"] = _name_for(orch, e.customer_id)
+        out.append(d)
+    return {"entries": out, "count": len(out)}
 
 
 # --------------------------------------------------------------------------- #

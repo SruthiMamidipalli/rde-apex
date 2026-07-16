@@ -51,18 +51,18 @@ export default function AtRiskQueue() {
         confidence={90}
         text={
           <>
-            Work the <strong>CRITICAL × high-LTV</strong> segment first.
+            Start with your highest-risk, highest-value customers.
             {topCritical && (
               <>
                 {" "}
-                Top priority: <strong>{topCritical.name}</strong> (score{" "}
-                {Math.round(topCritical.composite_score)}, {moneyExact(topCritical.ltv)} LTV) —
-                highest risk × value in the book.
+                Top priority: <strong>{topCritical.name}</strong> — risk score{" "}
+                {Math.round(topCritical.composite_score)} and worth{" "}
+                {moneyExact(topCritical.ltv)} over their lifetime.
               </>
             )}
           </>
         }
-        evidence={["Composite score [Scoring]", "Lifetime value [Shopify + CRM]"]}
+        evidence={["Risk score", "Customer lifetime value"]}
         acceptLabel="✓ Run agents on all at-risk"
         onAccept={runAll}
         onToast={showToast}
@@ -146,7 +146,7 @@ export default function AtRiskQueue() {
                   <td className="px-4 py-2.5 text-apex-muted">{i + 1}</td>
                   <td className="px-4 py-2.5">
                     <div className="font-semibold">{c.name}</div>
-                    <div className="text-[10px] text-apex-muted">{c.customer_id}</div>
+                    <div className="text-[10px] text-apex-muted">{c.tier} tier</div>
                   </td>
                   <td className="px-4 py-2.5"><TierBadge tier={c.tier} /></td>
                   <td className="px-4 py-2.5 font-bold">{Math.round(c.composite_score)}</td>

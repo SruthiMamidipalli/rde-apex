@@ -102,7 +102,10 @@ class Orchestrator:
         score = self.get_score(customer_id)
         result = self.agent.run_retention_workflow(profile, score)
         self._workflows[customer_id] = result
-        if submit:
+        # Only route to human approval for genuinely at-risk customers. LOW-risk
+        # customers don't need an intervention, so they never enter the queue
+        # (keeps the "LOW-risk costs $0 / no action" model honest).
+        if submit and score.risk_level is not RiskLevel.LOW:
             # time_since_signal simulates detection->delivery latency.
             self.approvals.submit_for_approval(result, time_since_signal_seconds=result.elapsed_seconds)
         return result

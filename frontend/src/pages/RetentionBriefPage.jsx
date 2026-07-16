@@ -6,6 +6,7 @@ import { useApi } from "../hooks/useApi";
 import { useStore } from "../lib/store";
 import { Panel, RiskBadge, Spinner, Cite, ProgressBar } from "../components/ui.jsx";
 import { fmtNum, SOURCE_LABEL, cn } from "../lib/utils";
+import { PERSONAS } from "../lib/personas";
 
 export default function RetentionBriefPage() {
   const { id } = useParams();
@@ -14,9 +15,16 @@ export default function RetentionBriefPage() {
   const list = useApi(() => api.rankedQueue(0), []);
   const selected = id;
 
+  const selectedName =
+    (list.data?.customers || []).find((c) => c.customer_id === selected)?.name || null;
+
   useEffect(() => {
-    setContext({ page: "Retention Brief", customer_id: selected || null });
-  }, [selected, setContext]);
+    setContext({
+      page: "Retention Brief",
+      customer_id: selected || null,
+      customer_name: selectedName,
+    });
+  }, [selected, selectedName, setContext]);
 
   useEffect(() => {
     if (!selected && list.data?.customers?.length) {
@@ -41,17 +49,36 @@ export default function RetentionBriefPage() {
           </button>
         ))}
       </Panel>
-      {selected ? <Brief id={selected} showToast={showToast} /> : <div />}
+      {selected ? (
+        <Brief
+          id={selected}
+          name={
+            (list.data?.customers || []).find((c) => c.customer_id === selected)?.name ||
+            "this customer"
+          }
+          showToast={showToast}
+        />
+      ) : (
+        <div />
+      )}
     </div>
   );
 }
 
-function Brief({ id, showToast }) {
+function Brief({ id, name, showToast }) {
+  const { persona } = useStore();
+  const p = PERSONAS[persona];
+  const approverLabel = `${p?.name} (${p?.title})`;
   const [wf, setWf] = useState(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [decision, setDecision] = useState(null);
-  const [approvalId, setApprovalId] = useState(null);
+  const [approval, setApproval] = useState(null);
+
+  const approvalId = approval?.approval_id || null;
+  // Who may approve THIS brief: escalated → DRI, else CRM.
+  const requiredRole = approval?.escalated ? "dri" : "crm";
+  const canApprove = approval && persona === requiredRole;
 
   async function load() {
     setLoading(true);
@@ -62,7 +89,9 @@ function Brief({ id, showToast }) {
       if (res.available) {
         const pend = await api.pendingApprovals();
         const match = pend.find((p) => p.workflow_result.customer_id === id);
-        setApprovalId(match?.approval_id || null);
+        setApproval(match || null);
+      } else {
+        setApproval(null);
       }
     } finally {
       setLoading(false);
@@ -76,7 +105,7 @@ function Brief({ id, showToast }) {
   async function run() {
     setRunning(true);
     try {
-      await api.runAgent(id);
+      await api.runAgent(id, persona);
       showToast("Agent pipeline complete — brief generated.");
       await load();
     } catch (e) {
@@ -90,12 +119,12 @@ function Brief({ id, showToast }) {
     if (!approvalId) return showToast("No pending approval for this brief.", "error");
     try {
       if (kind === "approve") {
-        await api.approve(approvalId);
-        setDecision("Approved — campaign queued for send.");
+        await api.approve(approvalId, approverLabel, persona);
+        setDecision("Approved — ready to send from Campaigns.");
       } else if (kind === "override") {
         const reason = window.prompt("Override reason (required):");
         if (!reason) return;
-        await api.override(approvalId, { reason, adjusted: true });
+        await api.override(approvalId, { reason, adjusted: true }, approverLabel, persona);
         setDecision(`Overridden — "${reason}". Logged to audit.`);
       } else {
         const reason = window.prompt("Reject reason (required):");
@@ -104,6 +133,7 @@ function Brief({ id, showToast }) {
         setDecision(`Escalated to DRI — "${reason}".`);
       }
       showToast("Decision logged to audit trail.");
+      await load();
     } catch (e) {
       showToast(e.message, "error");
     }
@@ -112,10 +142,22 @@ function Brief({ id, showToast }) {
   if (loading) return <Spinner label="Loading brief…" />;
 
   if (!wf) {
+    // Only the CRM Analyst generates briefs; the DRI reviews escalations.
+    if (persona === "dri") {
+      return (
+        <div className="panel flex flex-col items-center justify-center gap-2 p-10 text-center">
+          <div className="text-[13px] font-semibold">No brief awaiting your approval for {name}.</div>
+          <div className="text-[12px] text-apex-muted">
+            The CRM Analyst generates retention briefs. High-value ones are
+            escalated here for your sign-off.
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="panel flex flex-col items-center justify-center gap-3 p-10 text-center">
         <div className="text-[13px] text-apex-muted">
-          No brief generated for {id} yet. Run the 4-agent pipeline to produce one.
+          No brief generated for {name} yet. Run the 4-agent pipeline to produce one.
         </div>
         <button className="btn btn-primary" onClick={run} disabled={running}>
           <Play size={13} className={running ? "animate-pulse" : ""} />
@@ -198,7 +240,7 @@ function Brief({ id, showToast }) {
             <div className="space-y-3 p-4">
               <div>
                 <div className="label-caps">Offer</div>
-                <div className="mt-0.5 text-[15px] font-bold text-apex-accent2">
+                <div className="mt-0.5 text-[15px] font-bold text-apex-green">
                   {offer.value}
                 </div>
                 <div className="mt-1 text-[11px] text-apex-muted">{offer.description}</div>
@@ -217,19 +259,37 @@ function Brief({ id, showToast }) {
             </div>
           </Panel>
 
-          {/* Approve / Override / Reject */}
+          {/* Approve / Override / Reject — gated by role */}
           <Panel title="Human Approval">
-            <div className="flex flex-col gap-2 p-3">
-              <button className="btn border-apex-green/60 !text-apex-green hover:bg-apex-green/10" onClick={() => act("approve")}>
-                <Check size={14} /> Approve — queue campaign
-              </button>
-              <button className="btn border-apex-amber/60 !text-apex-amber hover:bg-apex-amber/10" onClick={() => act("override")}>
-                <Edit3 size={14} /> Override (reason required)
-              </button>
-              <button className="btn border-apex-red/60 !text-apex-red hover:bg-apex-red/10" onClick={() => act("reject")}>
-                <X size={14} /> Reject / escalate to DRI
-              </button>
-            </div>
+            {approval?.escalated && (
+              <div className="mx-3 mt-3 rounded-lg bg-apex-amber/10 px-3 py-2 text-[11px] font-semibold text-apex-amber">
+                ⬆ High-value / CRITICAL — requires DRI sign-off.
+              </div>
+            )}
+            {canApprove ? (
+              <div className="flex flex-col gap-2 p-3">
+                <button className="btn border-apex-green/60 !text-apex-green hover:bg-apex-green/10" onClick={() => act("approve")}>
+                  <Check size={14} /> Approve — stage for send
+                </button>
+                <button className="btn border-apex-amber/60 !text-apex-amber hover:bg-apex-amber/10" onClick={() => act("override")}>
+                  <Edit3 size={14} /> Override (reason required)
+                </button>
+                {!approval?.escalated && (
+                  <button className="btn border-apex-red/60 !text-apex-red hover:bg-apex-red/10" onClick={() => act("reject")}>
+                    <X size={14} /> Reject / escalate to DRI
+                  </button>
+                )}
+                <div className="mt-1 text-[10px] text-apex-muted">
+                  Approving as <strong>{approverLabel}</strong> · logged to audit.
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 text-[12px] text-apex-muted">
+                {approval
+                  ? `This brief is awaiting ${requiredRole === "dri" ? "DRI" : "CRM Analyst"} sign-off — you can review it but not approve it from your role.`
+                  : "No open approval for this brief."}
+              </div>
+            )}
           </Panel>
         </div>
       </div>

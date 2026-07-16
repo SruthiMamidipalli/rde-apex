@@ -16,7 +16,7 @@ import { useApi } from "../hooks/useApi";
 import { useStore } from "../lib/store";
 import { Panel, Spinner } from "../components/ui.jsx";
 import AiFlag from "../components/AiFlag.jsx";
-import { microMoney, fmtInt, fmtNum } from "../lib/utils";
+import { microMoney, fmtInt, fmtNum, CHART } from "../lib/utils";
 
 const MODEL_COLORS = { "Sonnet 4.5": "#4f6ef7", "Haiku 4.5": "#6ee7b7" };
 
@@ -43,13 +43,13 @@ export default function CostAnalytics() {
         confidence={92}
         text={
           <>
-            Multi-model routing is saving{" "}
-            <strong>{d ? fmtNum(d.savings_percentage, 0) : "—"}%</strong> vs an all-Sonnet baseline.
-            Signal collection & outreach run on Haiku; only conflict detection and offer strategy use
-            Sonnet. Keep threshold gating on — LOW-risk customers cost $0.
+            Sending each task to the right-sized AI model is saving{" "}
+            <strong>{d ? fmtNum(d.savings_percentage, 0) : "—"}%</strong> versus using
+            the most expensive model for everything. Low-risk customers cost nothing
+            because they don't trigger the AI at all.
           </>
         }
-        evidence={["Router logs [Cost service]"]}
+        evidence={["Model usage logs"]}
         onToast={showToast}
       />
 
@@ -61,7 +61,7 @@ export default function CostAnalytics() {
             <CostTile label="Total AI cost" value={microMoney(d.total_cost)} />
             <CostTile label="All-Sonnet baseline" value={microMoney(d.all_sonnet_baseline)} color="text-apex-muted" />
             <CostTile label="Savings" value={microMoney(d.savings)} color="text-apex-green" />
-            <CostTile label="Savings %" value={`${fmtNum(d.savings_percentage, 0)}%`} color="text-apex-accent2" />
+            <CostTile label="Savings %" value={`${fmtNum(d.savings_percentage, 0)}%`} color="text-apex-green" />
           </div>
 
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -85,7 +85,7 @@ export default function CostAnalytics() {
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{ background: "#1c2030", border: "1px solid #2a3050", borderRadius: 8, fontSize: 11 }}
+                      contentStyle={CHART.tooltip}
                       formatter={(v) => microMoney(v)}
                     />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -98,10 +98,10 @@ export default function CostAnalytics() {
               <div className="p-3">
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={tokenBars} margin={{ left: 10, right: 10 }}>
-                    <XAxis dataKey="name" tick={{ fill: "#7a82a0", fontSize: 10 }} />
-                    <YAxis tick={{ fill: "#7a82a0", fontSize: 10 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                    <XAxis dataKey="name" tick={CHART.axisTick} />
+                    <YAxis tick={CHART.axisTick} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                     <Tooltip
-                      contentStyle={{ background: "#1c2030", border: "1px solid #2a3050", borderRadius: 8, fontSize: 11 }}
+                      contentStyle={CHART.tooltip}
                       formatter={(v) => fmtInt(v)}
                     />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -145,6 +145,48 @@ export default function CostAnalytics() {
                       <td className="px-4 py-2.5 font-semibold">{microMoney(m.cost)}</td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+
+          <Panel title="Cost by Agent — 4-Agent Pipeline">
+            <div className="overflow-x-auto">
+              <table className="w-full text-[12px]">
+                <thead>
+                  <tr className="border-b border-apex-border text-left text-[10px] uppercase tracking-wide text-apex-muted">
+                    <th className="px-4 py-2">Agent</th>
+                    <th className="px-4 py-2">Model used</th>
+                    <th className="px-4 py-2">Runs</th>
+                    <th className="px-4 py-2">Input tokens</th>
+                    <th className="px-4 py-2">Output tokens</th>
+                    <th className="px-4 py-2">Cost</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(d.by_agent || []).map((a) => (
+                    <tr key={a.agent} className="border-b border-apex-border/60">
+                      <td className="px-4 py-2.5 font-semibold">{a.agent}</td>
+                      <td className="px-4 py-2.5">
+                        <span
+                          className="mr-2 inline-block h-2 w-2 rounded-full"
+                          style={{ background: MODEL_COLORS[a.model] }}
+                        />
+                        <span className="text-apex-muted">{a.model}</span>
+                      </td>
+                      <td className="px-4 py-2.5">{fmtInt(a.requests)}</td>
+                      <td className="px-4 py-2.5">{fmtInt(a.input_tokens)}</td>
+                      <td className="px-4 py-2.5">{fmtInt(a.output_tokens)}</td>
+                      <td className="px-4 py-2.5 font-semibold">{microMoney(a.cost)}</td>
+                    </tr>
+                  ))}
+                  {(d.by_agent || []).length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-6 text-center text-apex-muted">
+                        Run the agent pipeline to see per-agent costs.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

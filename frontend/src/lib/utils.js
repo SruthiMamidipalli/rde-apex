@@ -5,47 +5,64 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-// Risk band metadata keyed to the Apex palette.
+// Risk band metadata — hex values from apex-combined.html band dots.
 export const RISK_META = {
   LOW: {
     label: "LOW",
-    text: "text-apex-green",
-    bg: "bg-apex-green/10",
-    border: "border-apex-green/25",
-    dot: "bg-apex-green",
-    hex: "#34d399",
+    text: "text-apex-low",
+    bg: "bg-apex-low/10",
+    border: "border-apex-low/25",
+    dot: "bg-apex-low",
+    hex: "#30D158",
   },
   MEDIUM: {
     label: "MED",
     text: "text-apex-amber",
-    bg: "bg-apex-amber/10",
-    border: "border-apex-amber/25",
-    dot: "bg-apex-amber",
-    hex: "#f59e0b",
+    bg: "bg-apex-med/15",
+    border: "border-apex-med/40",
+    dot: "bg-apex-med",
+    hex: "#FFCC00",
   },
   HIGH: {
     label: "HIGH",
-    text: "text-apex-orange",
-    bg: "bg-apex-orange/10",
-    border: "border-apex-orange/25",
-    dot: "bg-apex-orange",
-    hex: "#fb923c",
+    text: "text-apex-high",
+    bg: "bg-apex-high/10",
+    border: "border-apex-high/25",
+    dot: "bg-apex-high",
+    hex: "#FF9500",
   },
   CRITICAL: {
     label: "CRITICAL",
-    text: "text-apex-red",
-    bg: "bg-apex-red/10",
-    border: "border-apex-red/25",
-    dot: "bg-apex-red",
-    hex: "#f87171",
+    text: "text-apex-crit",
+    bg: "bg-apex-crit/10",
+    border: "border-apex-crit/25",
+    dot: "bg-apex-crit",
+    hex: "#FF3B30",
   },
 };
 
 export const TIER_META = {
-  Bronze: "text-amber-300 bg-amber-900/30",
-  Silver: "text-slate-200 bg-slate-600/40",
-  Gold: "text-yellow-300 bg-yellow-900/30",
-  Platinum: "text-indigo-300 bg-indigo-900/40",
+  Bronze: "text-amber-800 bg-amber-100",
+  Silver: "text-slate-700 bg-slate-200",
+  Gold: "text-yellow-800 bg-yellow-100",
+  Platinum: "text-indigo-700 bg-indigo-100",
+};
+
+// Shared recharts theming for the light "zentra" design.
+export const CHART = {
+  axisTick: { fill: "#6b7280", fontSize: 10 },
+  grid: "#e7eaf0",
+  tooltip: {
+    background: "#ffffff",
+    border: "1px solid #e7eaf0",
+    borderRadius: 12,
+    fontSize: 11,
+    boxShadow: "0 8px 32px rgba(16,24,40,0.12)",
+    color: "#0d0f14",
+  },
+  accent: "#7745e6",
+  accent2: "#10b981",
+  muted: "#9ca3af",
 };
 
 // Source-system short labels + citation tags.

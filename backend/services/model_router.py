@@ -49,6 +49,20 @@ PRICING = {
     ModelTier.HAIKU: (1.0, 5.0),     # Claude Haiku 4.5
 }
 
+# Task -> the named agent in the 4-agent retention pipeline. Drives the
+# agent-level cost breakdown on the Cost Analytics page.
+TASK_AGENT = {
+    "analyze_churn_drivers": "Signal Collector",
+    "generate_offer": "Offer Strategist",
+    "generate_brief": "Conflict Detector",
+    "generate_outreach": "Engagement Crafter",
+    "generate_outreach_email": "Engagement Crafter",
+    "generate_outreach_sms": "Engagement Crafter",
+    "generate_outreach_push": "Engagement Crafter",
+    "summarize_signals": "Signal Collector",
+    "chatbot": "Assistant",
+}
+
 
 class ModelRouter:
     """Routes AI tasks to cost-optimal Bedrock models and tracks usage."""
@@ -192,6 +206,20 @@ class ModelRouter:
         savings = all_sonnet - total
         savings_pct = (savings / all_sonnet * 100) if all_sonnet > 0 else 0.0
 
+        # Agent-level breakdown (which of the 4 pipeline agents spent what).
+        by_agent: dict[str, dict] = {}
+        for e in self.usage_log:
+            agent = TASK_AGENT.get(e["task"], "Other")
+            model = "Sonnet 4.5" if e["tier"] == ModelTier.SONNET.value else "Haiku 4.5"
+            slot = by_agent.setdefault(
+                agent,
+                {"requests": 0, "input_tokens": 0, "output_tokens": 0, "cost": 0.0, "model": model},
+            )
+            slot["requests"] += 1
+            slot["input_tokens"] += e["input_tokens"]
+            slot["output_tokens"] += e["output_tokens"]
+            slot["cost"] += e["estimated_cost"]
+
         return {
             "total_cost": round(total, 6),
             "total_requests": len(self.usage_log),
@@ -201,5 +229,9 @@ class ModelRouter:
             "by_model": [
                 {"model": k, **{kk: (round(vv, 6) if kk == "cost" else vv) for kk, vv in v.items()}}
                 for k, v in by_model.items()
+            ],
+            "by_agent": [
+                {"agent": k, **{kk: (round(vv, 6) if kk == "cost" else vv) for kk, vv in v.items()}}
+                for k, v in by_agent.items()
             ],
         }

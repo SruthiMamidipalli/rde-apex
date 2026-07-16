@@ -91,6 +91,46 @@ def test_property_13_critical_escalation(risk, value_score):
     assert pending.escalated == should
 
 
+# Regression: re-submitting for the same customer supersedes the open approval
+# instead of stacking duplicates (one open approval per customer, max).
+@given(resubmits=st.integers(min_value=1, max_value=6))
+@settings(max_examples=50, deadline=None)
+def test_resubmit_supersedes_open_approval(resubmits):
+    _, approvals = _fresh_services()
+    last = None
+    for _ in range(resubmits):
+        last = approvals.submit_for_approval(_make_workflow(RiskLevel.HIGH, 40, cid="C001"))
+
+    open_for_c001 = [
+        p for p in approvals.get_pending()
+        if p.workflow_result.customer_id == "C001"
+    ]
+    # Exactly one open approval remains, and it is the most recent submission.
+    assert len(open_for_c001) == 1
+    assert open_for_c001[0].approval_id == last.approval_id
+    # A different customer is unaffected.
+    other = approvals.submit_for_approval(_make_workflow(RiskLevel.HIGH, 40, cid="C002"))
+    assert approvals.get_for_customer("C002").approval_id == other.approval_id
+    assert len([p for p in approvals.get_pending()
+                if p.workflow_result.customer_id == "C001"]) == 1
+
+
+# A decided (approved) approval is NOT superseded by a later resubmit — it stays
+# for the campaign/audit trail; only the new open one is added.
+def test_resubmit_keeps_decided_approval():
+    _, approvals = _fresh_services()
+    first = approvals.submit_for_approval(_make_workflow(RiskLevel.HIGH, 40, cid="C001"))
+    approvals.approve(first.approval_id, "alice")
+    second = approvals.submit_for_approval(_make_workflow(RiskLevel.HIGH, 40, cid="C001"))
+
+    all_c001 = [p for p in approvals.all() if p.workflow_result.customer_id == "C001"]
+    assert len(all_c001) == 2  # decided one kept, new open one added
+    assert approvals.get(first.approval_id) is not None
+    open_c001 = [p for p in approvals.get_pending()
+                 if p.workflow_result.customer_id == "C001"]
+    assert len(open_c001) == 1 and open_c001[0].approval_id == second.approval_id
+
+
 # Property 17: Audit Query Filter Correctness
 @given(
     entries=st.lists(

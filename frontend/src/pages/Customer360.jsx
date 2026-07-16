@@ -18,7 +18,7 @@ import { useApi } from "../hooks/useApi";
 import { useStore } from "../lib/store";
 import { Panel, RiskBadge, TierBadge, ScoreRing, Spinner, Cite } from "../components/ui.jsx";
 import AiFlag from "../components/AiFlag.jsx";
-import { fmtNum, SOURCE_LABEL, cn } from "../lib/utils";
+import { fmtNum, SOURCE_LABEL, cn, CHART } from "../lib/utils";
 
 export default function Customer360() {
   const { id } = useParams();
@@ -27,9 +27,16 @@ export default function Customer360() {
   const list = useApi(() => api.rankedQueue(0), []);
   const selected = id;
 
+  const selectedName =
+    (list.data?.customers || []).find((c) => c.customer_id === selected)?.name || null;
+
   useEffect(() => {
-    setContext({ page: "Customer 360", customer_id: selected || null });
-  }, [selected, setContext]);
+    setContext({
+      page: "Customer 360",
+      customer_id: selected || null,
+      customer_name: selectedName,
+    });
+  }, [selected, selectedName, setContext]);
 
   // Auto-select the first CRM-divergence customer (Eleanor) when none chosen.
   useEffect(() => {
@@ -57,7 +64,7 @@ export default function Customer360() {
           >
             <span className="flex-1">
               <span className="block text-[12px] font-semibold">{c.name}</span>
-              <span className="text-[10px] text-apex-muted">{c.customer_id} · {c.tier}</span>
+              <span className="text-[10px] text-apex-muted">{c.tier} tier</span>
             </span>
             <span className="text-[12px] font-bold" style={{ color: RISK_HEX[c.risk_level] }}>
               {Math.round(c.composite_score)}
@@ -117,7 +124,7 @@ function CustomerDetail({ id, showToast, navigate }) {
             )}
           </div>
           <div className="mt-0.5 text-[11px] text-apex-muted">
-            {c.customer_id} · {c.email} · Member since{" "}
+            {c.email} · Member since{" "}
             {new Date(c.join_date).toLocaleDateString()} · LTV ${Math.round(c.ltv).toLocaleString()}
           </div>
         </div>
@@ -146,14 +153,15 @@ function CustomerDetail({ id, showToast, navigate }) {
         confidence={s?.confidence || 85}
         text={
           <>
-            Most decisive signal: <strong>{breakdown[0]?.name}</strong>. Trust the composite over
-            the CRM health score. Recommend generating a retention brief now.
+            The biggest warning sign is <strong>{breakdown[0]?.name}</strong>. The
+            combined score is more reliable than the CRM's health rating here —
+            worth preparing a retention brief.
           </>
         }
         evidence={(s?.signal_contributions || [])
           .slice(0, 4)
           .map((x) => `${x.signal_name} ${fmtNum(x.normalized_score, 0)} [${SOURCE_LABEL[x.source]}]`)}
-        acceptLabel="✓ Generate brief"
+        acceptLabel="✓ Accept recommendation"
         onAccept={() => navigate(`/brief/${id}`)}
         onToast={showToast}
       />
@@ -164,10 +172,10 @@ function CustomerDetail({ id, showToast, navigate }) {
           <div className="p-3">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={breakdown} layout="vertical" margin={{ left: 10, right: 20 }}>
-                <XAxis type="number" tick={{ fill: "#7a82a0", fontSize: 10 }} />
-                <YAxis type="category" dataKey="name" tick={{ fill: "#7a82a0", fontSize: 10 }} width={60} />
+                <XAxis type="number" tick={CHART.axisTick} />
+                <YAxis type="category" dataKey="name" tick={CHART.axisTick} width={60} />
                 <Tooltip
-                  contentStyle={{ background: "#1c2030", border: "1px solid #2a3050", borderRadius: 8, fontSize: 11 }}
+                  contentStyle={CHART.tooltip}
                   formatter={(v) => [`${fmtNum(v, 1)} pts`, "Weighted"]}
                 />
                 <Bar dataKey="contribution" radius={[0, 4, 4, 0]}>
@@ -189,8 +197,8 @@ function CustomerDetail({ id, showToast, navigate }) {
           <div className="p-3">
             <ResponsiveContainer width="100%" height={200}>
               <RadarChart data={radarData}>
-                <PolarGrid stroke="#2a3050" />
-                <PolarAngleAxis dataKey="signal" tick={{ fill: "#7a82a0", fontSize: 10 }} />
+                <PolarGrid stroke={CHART.grid} />
+                <PolarAngleAxis dataKey="signal" tick={CHART.axisTick} />
                 <Radar dataKey="value" stroke="#4f6ef7" fill="#4f6ef7" fillOpacity={0.35} />
               </RadarChart>
             </ResponsiveContainer>

@@ -47,15 +47,18 @@ class AtRiskResponse(BaseModel):
 # --------------------------------------------------------------------------- #
 class ApproveRequest(BaseModel):
     approver: str = "crm_analyst"
+    role: str | None = None  # "crm" | "dri" — the acting persona
 
 
 class OverrideRequest(BaseModel):
     approver: str = "crm_analyst"
+    role: str | None = None
     modifications: dict
 
 
 class EscalateRequest(BaseModel):
     approver: str = "crm_analyst"
+    role: str | None = None
     reason: str = "CRITICAL risk exceeds value threshold"
     escalated_to: str = "DRI"
 
@@ -93,6 +96,15 @@ class CostByModel(BaseModel):
     cost: float
 
 
+class CostByAgent(BaseModel):
+    agent: str
+    model: str
+    requests: int
+    input_tokens: int
+    output_tokens: int
+    cost: float
+
+
 class CostOptimizationResponse(BaseModel):
     total_cost: float
     total_requests: int
@@ -100,6 +112,7 @@ class CostOptimizationResponse(BaseModel):
     savings: float
     savings_percentage: float
     by_model: list[CostByModel]
+    by_agent: list[CostByAgent] = []
 
 
 # --------------------------------------------------------------------------- #

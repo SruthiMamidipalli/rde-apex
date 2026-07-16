@@ -53,6 +53,16 @@ class Settings:
     # When True, force deterministic (no-Bedrock) generation regardless of creds.
     FORCE_DEGRADED: bool = os.getenv("FORCE_DEGRADED", "false").lower() == "true"
 
+    # Comma-separated allowed CORS origins. Defaults to the Vite dev server.
+    # Set CORS_ORIGINS="*" to allow all (disables credentialed requests).
+    CORS_ORIGINS: str = os.getenv(
+        "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
+
     @property
     def bedrock_available(self) -> bool:
         """True only if credentials are present and degraded mode is not forced."""

@@ -36,29 +36,34 @@ export const api = {
   atRisk: (threshold = 50) => request(`/score/at-risk?threshold=${threshold}`),
   rankedQueue: (threshold = 50) => request(`/queue/ranked?threshold=${threshold}`),
 
-  // Agents
-  runAgent: (id) => request(`/agent/run/${id}`, { method: "POST" }),
-  runAll: (threshold = 50) =>
-    request(`/agent/run-all?threshold=${threshold}`, { method: "POST" }),
+  // Agents (role gates generation to the CRM Analyst)
+  runAgent: (id, role) =>
+    request(`/agent/run/${id}${role ? `?role=${role}` : ""}`, { method: "POST" }),
+  runAll: (threshold = 50, role) =>
+    request(`/agent/run-all?threshold=${threshold}${role ? `&role=${role}` : ""}`, {
+      method: "POST",
+    }),
   getBrief: (id) => request(`/agent/brief/${id}`),
 
-  // Approvals
+  // Approvals (role = "crm" | "dri" — enforces two-tier authority)
   pendingApprovals: () => request("/approvals/pending"),
-  approve: (approvalId, approver = "sarah.a") =>
+  approve: (approvalId, approver, role) =>
     request(`/approvals/${approvalId}/approve`, {
       method: "POST",
-      body: JSON.stringify({ approver }),
+      body: JSON.stringify({ approver, role }),
     }),
-  override: (approvalId, modifications, approver = "sarah.a") =>
+  override: (approvalId, modifications, approver, role) =>
     request(`/approvals/${approvalId}/override`, {
       method: "POST",
-      body: JSON.stringify({ approver, modifications }),
+      body: JSON.stringify({ approver, role, modifications }),
     }),
   escalate: (approvalId, reason = "Manual escalation to DRI") =>
     request(`/approvals/${approvalId}/escalate`, {
       method: "POST",
       body: JSON.stringify({ approver: "sarah.a", reason, escalated_to: "DRI" }),
     }),
+  sendOutreach: (approvalId) =>
+    request(`/approvals/${approvalId}/send`, { method: "POST" }),
 
   // Dashboard / KPIs
   metrics: () => request("/dashboard/metrics"),

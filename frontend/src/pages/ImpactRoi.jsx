@@ -14,7 +14,7 @@ import { useApi } from "../hooks/useApi";
 import { useStore } from "../lib/store";
 import { KpiCard, Panel, Spinner } from "../components/ui.jsx";
 import AiFlag from "../components/AiFlag.jsx";
-import { money, moneyExact, fmtKpi } from "../lib/utils";
+import { money, moneyExact, fmtKpi, CHART } from "../lib/utils";
 
 export default function ImpactRoi() {
   const { setContext, showToast } = useStore();
@@ -38,12 +38,12 @@ export default function ImpactRoi() {
         confidence={86}
         text={
           <>
-            Underperforming lever: <strong>redemption rate</strong> is climbing but still below the
-            35% target. Push double-points offers to Gold/Platinum inactive members to accelerate.
-            Every other lever is on track to plan.
+            <strong>Reward redemption</strong> is improving but still under the 35%
+            goal. Offering double points to inactive Gold and Platinum members
+            would speed it up. Everything else is on track.
           </>
         }
-        evidence={["Redemption [Yotpo]", "Save rate [Klaviyo + Shopify]"]}
+        evidence={["Redemption rate", "Customer save rate"]}
         onToast={showToast}
       />
 
@@ -53,7 +53,7 @@ export default function ImpactRoi() {
           <RoiTile label="Platform cost" value={money(roi.platform_cost)} />
           <RoiTile label="Revenue protected / yr" value={money(roi.revenue_protected)} color="text-apex-green" />
           <RoiTile label="Net value" value={money(roi.net)} color={roi.net >= 0 ? "text-apex-green" : "text-apex-red"} />
-          <RoiTile label="ROI multiple" value={`${roi.roi_multiple}×`} color="text-apex-accent2" />
+          <RoiTile label="ROI multiple" value={`${roi.roi_multiple}×`} color="text-apex-green" />
         </div>
       )}
 
@@ -74,15 +74,15 @@ export default function ImpactRoi() {
           <div className="p-3">
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={baData} margin={{ left: -10, right: 10 }}>
-                <XAxis dataKey="name" tick={{ fill: "#7a82a0", fontSize: 9 }} interval={0} angle={-12} textAnchor="end" height={50} />
-                <YAxis tick={{ fill: "#7a82a0", fontSize: 10 }} />
+                <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 9 }} interval={0} angle={-12} textAnchor="end" height={50} />
+                <YAxis tick={CHART.axisTick} />
                 <Tooltip
-                  contentStyle={{ background: "#1c2030", border: "1px solid #2a3050", borderRadius: 8, fontSize: 11 }}
+                  contentStyle={CHART.tooltip}
                   formatter={(v) => `${v}%`}
                 />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="Before" fill="#7a82a0" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="After" fill="#4f6ef7" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="Before" fill="#cbd5e1" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="After" fill="#7745e6" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -97,7 +97,7 @@ export default function ImpactRoi() {
                 <div className="mt-1 flex items-center gap-2 text-[11px]">
                   <span className="rounded bg-apex-surface3 px-2 py-0.5 text-apex-muted">{m.manual}</span>
                   <span className="text-apex-muted">→</span>
-                  <span className="rounded bg-apex-accent/15 px-2 py-0.5 text-apex-accent2">{m.agentic}</span>
+                  <span className="rounded bg-apex-accent/15 px-2 py-0.5 text-apex-green">{m.agentic}</span>
                   <span className="ml-auto text-[10px] font-semibold text-apex-green">{m.improvement}</span>
                 </div>
               </div>

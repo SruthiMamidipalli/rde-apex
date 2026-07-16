@@ -96,36 +96,36 @@ export function KpiCard({ kpi }) {
       ? kpi.value - kpi.baseline
       : null;
   return (
-    <div className="panel card-hover flex flex-col gap-1.5 p-4" title={kpi.formula}>
-      <div className="label-caps">{kpi.name}</div>
-      <div className={cn("stat-value", tone)}>{fmtKpi(kpi.value, kpi.format)}</div>
-      <div className="flex items-center gap-2">
-        {kpi.target != null && (
-          <span className="text-[10px] text-apex-muted">
-            Target {fmtKpi(kpi.target, kpi.format)}
-          </span>
-        )}
+    <div className="panel card-hover flex flex-col gap-2 p-5" title={kpi.formula}>
+      <div className="flex items-center justify-between">
+        <div className="label-caps">{kpi.name}</div>
         {delta != null && kpi.direction !== "neutral" && (
           <span
             className={cn(
-              "rounded px-1.5 py-0.5 text-[10px] font-semibold",
+              "rounded-full px-2 py-0.5 text-[10px] font-semibold",
               (kpi.direction === "lower" ? delta < 0 : delta > 0)
-                ? "bg-apex-green/12 text-apex-green"
-                : "bg-apex-red/12 text-apex-red"
+                ? "bg-apex-green/10 text-apex-green"
+                : "bg-apex-red/10 text-apex-red"
             )}
           >
-            {delta > 0 ? "↑" : "↓"} {Math.abs(delta).toFixed(1)} vs {kpi.baseline}
+            {delta > 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(1)}
           </span>
         )}
       </div>
-      <div className="mt-1 h-1 rounded bg-apex-surface3">
+      <div className={cn("stat-value", tone)}>{fmtKpi(kpi.value, kpi.format)}</div>
+      {kpi.target != null && (
+        <div className="text-[11px] text-apex-muted">
+          Target {fmtKpi(kpi.target, kpi.format)}
+        </div>
+      )}
+      <div className="mt-1 h-1.5 rounded-full bg-apex-surface3">
         <div
-          className={cn("h-1 rounded transition-all", barColor)}
+          className={cn("h-1.5 rounded-full transition-all", barColor)}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <div className="mt-0.5 flex items-center gap-1 text-[9px] text-apex-muted">
-        <span>◈</span> {kpi.source}
+      <div className="mt-0.5 flex items-center gap-1 text-[10px] text-apex-muted">
+        <span className="text-apex-accent">◈</span> {kpi.source}
       </div>
     </div>
   );
@@ -139,7 +139,7 @@ export function ScoreRing({ score, level, size = 64 }) {
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth="6" stroke="#232840" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth="6" stroke="#e9edf3" />
         <circle
           cx={size / 2}
           cy={size / 2}

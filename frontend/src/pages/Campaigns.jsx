@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Send } from "lucide-react";
 import { api } from "../lib/api";
 import { useApi } from "../hooks/useApi";
 import { useStore } from "../lib/store";
@@ -9,11 +10,26 @@ import { fmtNum, cn } from "../lib/utils";
 export default function Campaigns() {
   const { setContext, showToast } = useStore();
   const camp = useApi(() => api.campaigns(), []);
+  const [sending, setSending] = useState(null);
   useEffect(() => setContext({ page: "Campaign & Outreach", customer_id: null }), [setContext]);
 
   const rows = camp.data?.campaigns || [];
-  const live = rows.filter((r) => r.delivered);
-  const avgOpen = live.length ? live.reduce((a, r) => a + (r.open_rate || 0), 0) / live.length : 0;
+  const sent = rows.filter((r) => r.sent);
+  const ready = rows.filter((r) => r.sendable);
+  const avgOpen = sent.length ? sent.reduce((a, r) => a + (r.open_rate || 0), 0) / sent.length : 0;
+
+  async function send(row) {
+    setSending(row.campaign_id);
+    try {
+      const res = await api.sendOutreach(row.campaign_id);
+      showToast(`Outreach sent to ${res.customer_name} via ${res.sent_channels.join(", ")}.`);
+      await camp.refetch();
+    } catch (e) {
+      showToast(e.message, "error");
+    } finally {
+      setSending(null);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -23,31 +39,27 @@ export default function Campaigns() {
         confidence={84}
         text={
           <>
-            Best channel + send time: lead with <strong>SMS</strong> for CRITICAL customers (email
-            open rates have collapsed), follow with email at <strong>10am local</strong>. Apply
-            frequency capping — suppress anyone contacted in the last 72h.
+            For your highest-risk customers, send a text first (their email
+            opens have dropped), then follow up by email at <strong>10am</strong>.
+            Don't contact anyone twice within 72 hours.
           </>
         }
-        evidence={["Open rate 8.2% [Klaviyo]", "SMS response higher [Klaviyo]"]}
+        evidence={["Email open rate only 8%", "Texts get more replies"]}
         onToast={showToast}
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <MiniStat label="Campaigns" value={rows.length} />
-        <MiniStat label="Live" value={live.length} color="text-apex-green" />
-        <MiniStat label="Avg open rate" value={`${fmtNum(avgOpen * 100, 0)}%`} />
-        <MiniStat
-          label="Pending"
-          value={rows.length - live.length}
-          color="text-apex-amber"
-        />
+        <MiniStat label="Approved briefs" value={rows.length} />
+        <MiniStat label="Sent" value={sent.length} color="text-apex-green" />
+        <MiniStat label="Ready to send" value={ready.length} color="text-apex-amber" />
+        <MiniStat label="Avg open rate (sent)" value={`${fmtNum(avgOpen * 100, 0)}%`} />
       </div>
 
       <Panel title="Campaign Tracking">
         {camp.loading && <div className="p-4"><Spinner /></div>}
         {!camp.loading && rows.length === 0 && (
           <div className="px-4 py-8 text-center text-[12px] text-apex-muted">
-            No campaigns yet. Approve briefs in the Retention Brief area to launch campaigns.
+            No approved briefs yet. Approve a brief in Retention Brief, then send it here.
           </div>
         )}
         {rows.length > 0 && (
@@ -58,27 +70,29 @@ export default function Campaigns() {
                   <th className="px-4 py-2">Customer</th>
                   <th className="px-4 py-2">Offer</th>
                   <th className="px-4 py-2">Channel</th>
+                  <th className="px-4 py-2">Approved by</th>
                   <th className="px-4 py-2">Status</th>
                   <th className="px-4 py-2">Open</th>
                   <th className="px-4 py-2">Redeem</th>
-                  <th className="px-4 py-2">Confidence</th>
+                  <th className="px-4 py-2 text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.campaign_id} className="border-b border-apex-border/60">
-                    <td className="px-4 py-2.5 font-semibold">{r.customer_id}</td>
+                    <td className="px-4 py-2.5 font-semibold">{r.customer_name}</td>
                     <td className="px-4 py-2.5">{r.offer}</td>
                     <td className="px-4 py-2.5 text-apex-muted">{r.channel}</td>
+                    <td className="px-4 py-2.5 text-apex-muted">{r.approved_by || "—"}</td>
                     <td className="px-4 py-2.5">
                       <span
                         className={cn(
                           "rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                          r.status === "Live"
+                          r.sent
                             ? "bg-apex-green/12 text-apex-green"
-                            : r.status === "Escalated"
-                            ? "bg-apex-amber/12 text-apex-amber"
-                            : "bg-apex-surface3 text-apex-muted"
+                            : r.sendable
+                            ? "bg-apex-accent/12 text-apex-accent"
+                            : "bg-apex-amber/12 text-apex-amber"
                         )}
                       >
                         {r.status}
@@ -86,7 +100,22 @@ export default function Campaigns() {
                     </td>
                     <td className="px-4 py-2.5">{r.open_rate != null ? `${fmtNum(r.open_rate * 100, 0)}%` : "—"}</td>
                     <td className="px-4 py-2.5">{r.redeem_rate != null ? `${fmtNum(r.redeem_rate * 100, 0)}%` : "—"}</td>
-                    <td className="px-4 py-2.5 font-semibold text-apex-green">{Math.round(r.confidence)}</td>
+                    <td className="px-4 py-2.5 text-right">
+                      {r.sendable ? (
+                        <button
+                          className="btn btn-primary !py-1.5 !px-3"
+                          onClick={() => send(r)}
+                          disabled={sending === r.campaign_id}
+                        >
+                          <Send size={12} className={sending === r.campaign_id ? "animate-pulse" : ""} />
+                          {sending === r.campaign_id ? "Sending…" : "Send"}
+                        </button>
+                      ) : r.sent ? (
+                        <span className="text-[11px] text-apex-muted">✓ Sent</span>
+                      ) : (
+                        <span className="text-[11px] text-apex-muted">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -94,8 +123,8 @@ export default function Campaigns() {
           </div>
         )}
         <div className="border-t border-apex-border px-4 py-2 text-[10px] text-apex-muted">
-          Performance simulated from approved interventions <Cite>Klaviyo + Yotpo</Cite>. Frequency
-          capping active. Write-back to source systems is on the production roadmap.
+          Approved briefs are sent from here. Delivery is simulated (no real email
+          provider); open / redeem rates appear once sent <Cite>Klaviyo + Yotpo</Cite>.
         </div>
       </Panel>
     </div>

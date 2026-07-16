@@ -42,10 +42,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+from config import settings  # noqa: E402
+
+_cors_origins = settings.cors_origins
+_allow_all = _cors_origins == ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    # Credentialed requests can't be combined with a "*" origin (browsers reject
+    # it), so only enable credentials when origins are explicitly listed.
+    allow_credentials=not _allow_all,
     allow_methods=["*"],
     allow_headers=["*"],
 )

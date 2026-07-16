@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
@@ -14,52 +14,67 @@ body,
 
 body {
   @apply bg-apex-bg text-apex-text antialiased;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
   font-size: 13px;
 }
 
-/* Custom scrollbar (matches reference) */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #232840;
-  border-radius: 3px;
+  background: #d5dae2;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c2c9d4;
 }
 
 @layer components {
   .panel {
-    @apply rounded-[10px] border border-apex-border bg-apex-surface;
+    @apply rounded-[14px] border border-apex-border bg-apex-surface;
   }
   .panel-header {
-    @apply flex items-center gap-2 border-b border-apex-border px-4 py-3;
+    @apply flex items-center gap-2 border-b border-apex-border px-5 py-4;
   }
   .panel-title {
-    @apply flex-1 text-xs font-bold text-apex-text;
+    @apply flex-1 text-[15px] font-semibold text-apex-text;
   }
   .card-hover {
-    @apply transition-colors hover:border-apex-accent;
+    @apply transition-all hover:shadow-card;
   }
+  /* Primary action = green (matches HTML btn-primary) */
   .btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-apex-border bg-apex-surface2 px-3.5 py-1.5 text-xs font-medium text-apex-text transition-all hover:border-apex-accent hover:bg-apex-surface3 disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border border-apex-border bg-apex-surface px-3.5 py-2 text-xs font-medium text-apex-text transition-all hover:bg-apex-surface2 disabled:opacity-50;
   }
   .btn-primary {
-    @apply border-apex-accent bg-apex-accent text-white hover:bg-apex-accent hover:opacity-90;
+    @apply border-transparent bg-apex-green text-white hover:opacity-90;
+  }
+  .btn-accent {
+    @apply border-transparent bg-apex-accent text-white hover:opacity-90;
+  }
+  .btn-dark {
+    @apply border-transparent bg-apex-ink text-white hover:opacity-90;
   }
   .chip {
-    @apply cursor-pointer rounded-full border border-apex-border bg-apex-surface2 px-2.5 py-1 text-[10px] text-apex-muted transition-all hover:border-apex-accent hover:text-apex-accent;
+    @apply cursor-pointer rounded-md border border-apex-border bg-apex-surface px-2.5 py-1 text-[11px] text-apex-muted2 transition-all hover:border-apex-accent hover:text-apex-accent;
   }
   .label-caps {
-    @apply text-[10px] font-semibold uppercase tracking-[0.08em] text-apex-muted;
+    @apply text-[10px] font-semibold uppercase tracking-[0.1em] text-apex-muted;
   }
   .stat-value {
-    @apply text-[26px] font-extrabold tracking-tight;
+    @apply text-[28px] font-bold tracking-tight;
   }
   .tag {
-    @apply rounded-[3px] bg-apex-surface3 px-1.5 py-0.5 text-[10px] text-apex-muted;
+    @apply rounded-[5px] bg-apex-surface3 px-1.5 py-0.5 text-[10px] font-semibold text-apex-muted2;
+  }
+  /* Serif display headings (greetings / page titles) */
+  .display {
+    font-family: Georgia, Cambria, "Times New Roman", serif;
+    @apply font-bold tracking-tight;
   }
 }

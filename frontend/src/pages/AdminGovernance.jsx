@@ -31,12 +31,13 @@ export default function AdminGovernance() {
         confidence={83}
         text={
           <>
-            Weights to retune: <strong>engagement_drop (CRM)</strong> carries 20% weight but is the
-            lagging, lowest-trust signal — consider lowering. Connectors to fix:{" "}
-            <strong>Klaviyo</strong> is running a 15-minute sync lag.
+            Consider lowering the weight on the <strong>CRM engagement</strong>{" "}
+            signal — it's the least reliable but counts for 20% of the score. Also,
+            the <strong>Klaviyo</strong> connector is 15 minutes behind and should
+            be checked.
           </>
         }
-        evidence={["Weight config [Scoring]", "Connector health [All 6]"]}
+        evidence={["Score weight settings", "Connector health (all 6)"]}
         onToast={showToast}
       />
 
@@ -116,7 +117,7 @@ export default function AdminGovernance() {
                   <td className="px-4 py-2 text-apex-muted">
                     {new Date(e.timestamp).toLocaleTimeString()}
                   </td>
-                  <td className="px-4 py-2 font-semibold">{e.customer_id}</td>
+                  <td className="px-4 py-2 font-semibold">{e.customer_name}</td>
                   <td className={cn("px-4 py-2 font-semibold", EVENT_COLOR[e.event_type])}>
                     {e.event_type}
                   </td>

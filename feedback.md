@@ -1,0 +1,1 @@
+Ai recommendation language can can be simplified-, Ensure guardrails are applied throughout the scope of the implementation, Duplicate Generate Retention icons in Customer 360 page, Login page with CRM and DRI profile is missing, Don't display customer id in the web page, please show the agent level cost

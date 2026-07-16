@@ -1,0 +1,210 @@
+[
+  {
+    "customer_id": "C001",
+    "email_open_rate": 0.045,
+    "email_click_rate": 0.013,
+    "sms_response_rate": 0.004,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-05-16T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C002",
+    "email_open_rate": 0.02,
+    "email_click_rate": 0,
+    "sms_response_rate": 0,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-05-16T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C003",
+    "email_open_rate": 0,
+    "email_click_rate": 0,
+    "sms_response_rate": 0,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-05-16T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C004",
+    "email_open_rate": 0.075,
+    "email_click_rate": 0.031,
+    "sms_response_rate": 0.028,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-05-16T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C005",
+    "email_open_rate": 0.05,
+    "email_click_rate": 0.016,
+    "sms_response_rate": 0.008,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-05-16T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C006",
+    "email_open_rate": 0.125,
+    "email_click_rate": 0.031,
+    "sms_response_rate": 0.068,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-06-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C007",
+    "email_open_rate": 0.1,
+    "email_click_rate": 0.016,
+    "sms_response_rate": 0.048,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-06-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C008",
+    "email_open_rate": 0.18,
+    "email_click_rate": 0.064,
+    "sms_response_rate": 0.112,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-06-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C009",
+    "email_open_rate": 0.155,
+    "email_click_rate": 0.049,
+    "sms_response_rate": 0.092,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-06-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C010",
+    "email_open_rate": 0.145,
+    "email_click_rate": 0.043,
+    "sms_response_rate": 0.084,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-06-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C011",
+    "email_open_rate": 0.12,
+    "email_click_rate": 0.028,
+    "sms_response_rate": 0.064,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-06-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C012",
+    "email_open_rate": 0.095,
+    "email_click_rate": 0.013,
+    "sms_response_rate": 0.044,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-06-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C013",
+    "email_open_rate": 0.345,
+    "email_click_rate": 0.131,
+    "sms_response_rate": 0.248,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-03T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C014",
+    "email_open_rate": 0.32,
+    "email_click_rate": 0.116,
+    "sms_response_rate": 0.228,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-03T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C015",
+    "email_open_rate": 0.295,
+    "email_click_rate": 0.101,
+    "sms_response_rate": 0.208,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-03T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C016",
+    "email_open_rate": 0.27,
+    "email_click_rate": 0.086,
+    "sms_response_rate": 0.188,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-03T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C017",
+    "email_open_rate": 0.35,
+    "email_click_rate": 0.134,
+    "sms_response_rate": 0.252,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-03T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C018",
+    "email_open_rate": 0.325,
+    "email_click_rate": 0.119,
+    "sms_response_rate": 0.232,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-03T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C019",
+    "email_open_rate": 0.61,
+    "email_click_rate": 0.334,
+    "sms_response_rate": 0.472,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-13T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C020",
+    "email_open_rate": 0.6,
+    "email_click_rate": 0.328,
+    "sms_response_rate": 0.464,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-13T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C021",
+    "email_open_rate": 0.575,
+    "email_click_rate": 0.313,
+    "sms_response_rate": 0.444,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-13T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C022",
+    "email_open_rate": 0.655,
+    "email_click_rate": 0.361,
+    "sms_response_rate": 0.508,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-13T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C023",
+    "email_open_rate": 0.63,
+    "email_click_rate": 0.346,
+    "sms_response_rate": 0.488,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-13T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C024",
+    "email_open_rate": 0.605,
+    "email_click_rate": 0.331,
+    "sms_response_rate": 0.468,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-13T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C025",
+    "email_open_rate": 0.58,
+    "email_click_rate": 0.316,
+    "sms_response_rate": 0.448,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-07-13T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C026",
+    "email_open_rate": 0.05,
+    "email_click_rate": 0.01,
+    "sms_response_rate": 0,
+    "unsubscribed": false,
+    "last_email_open_date": "2026-05-20T00:00:00+00:00"
+  }
+]

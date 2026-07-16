@@ -1,0 +1,194 @@
+[
+  {
+    "customer_id": "C001",
+    "open_tickets": 3,
+    "avg_sentiment_score": -0.74,
+    "unresolved_tickets": 3,
+    "avg_resolution_time_hours": 96.0,
+    "last_ticket_date": "2026-07-10T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C002",
+    "open_tickets": 3,
+    "avg_sentiment_score": -0.78,
+    "unresolved_tickets": 3,
+    "avg_resolution_time_hours": 96.0,
+    "last_ticket_date": "2026-07-10T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C003",
+    "open_tickets": 3,
+    "avg_sentiment_score": -0.82,
+    "unresolved_tickets": 3,
+    "avg_resolution_time_hours": 96.0,
+    "last_ticket_date": "2026-07-10T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C004",
+    "open_tickets": 3,
+    "avg_sentiment_score": -0.69,
+    "unresolved_tickets": 3,
+    "avg_resolution_time_hours": 96.0,
+    "last_ticket_date": "2026-07-10T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C005",
+    "open_tickets": 3,
+    "avg_sentiment_score": -0.73,
+    "unresolved_tickets": 3,
+    "avg_resolution_time_hours": 96.0,
+    "last_ticket_date": "2026-07-10T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C006",
+    "open_tickets": 1,
+    "avg_sentiment_score": -0.32,
+    "unresolved_tickets": 1,
+    "avg_resolution_time_hours": 52.0,
+    "last_ticket_date": "2026-07-01T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C007",
+    "open_tickets": 1,
+    "avg_sentiment_score": -0.36,
+    "unresolved_tickets": 1,
+    "avg_resolution_time_hours": 52.0,
+    "last_ticket_date": "2026-07-01T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C008",
+    "open_tickets": 1,
+    "avg_sentiment_score": -0.24,
+    "unresolved_tickets": 1,
+    "avg_resolution_time_hours": 52.0,
+    "last_ticket_date": "2026-07-01T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C009",
+    "open_tickets": 1,
+    "avg_sentiment_score": -0.28,
+    "unresolved_tickets": 1,
+    "avg_resolution_time_hours": 52.0,
+    "last_ticket_date": "2026-07-01T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C010",
+    "open_tickets": 1,
+    "avg_sentiment_score": -0.29,
+    "unresolved_tickets": 1,
+    "avg_resolution_time_hours": 52.0,
+    "last_ticket_date": "2026-07-01T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C012",
+    "open_tickets": 1,
+    "avg_sentiment_score": -0.37,
+    "unresolved_tickets": 1,
+    "avg_resolution_time_hours": 52.0,
+    "last_ticket_date": "2026-07-01T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C013",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.16,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 26.0,
+    "last_ticket_date": "2026-06-05T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C014",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.12,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 26.0,
+    "last_ticket_date": "2026-06-05T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C015",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.08,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 26.0,
+    "last_ticket_date": "2026-06-05T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C017",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.16,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 26.0,
+    "last_ticket_date": "2026-06-05T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C018",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.12,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 26.0,
+    "last_ticket_date": "2026-06-05T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C019",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.68,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 8.0,
+    "last_ticket_date": "2026-03-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C020",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.67,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 8.0,
+    "last_ticket_date": "2026-03-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C021",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.63,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 8.0,
+    "last_ticket_date": "2026-03-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C022",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.76,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 8.0,
+    "last_ticket_date": "2026-03-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C023",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.72,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 8.0,
+    "last_ticket_date": "2026-03-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C024",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.68,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 8.0,
+    "last_ticket_date": "2026-03-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C025",
+    "open_tickets": 0,
+    "avg_sentiment_score": 0.64,
+    "unresolved_tickets": 0,
+    "avg_resolution_time_hours": 8.0,
+    "last_ticket_date": "2026-03-17T00:00:00+00:00"
+  },
+  {
+    "customer_id": "C026",
+    "open_tickets": 2,
+    "avg_sentiment_score": -0.85,
+    "unresolved_tickets": 2,
+    "avg_resolution_time_hours": 168.0,
+    "last_ticket_date": "2026-07-09T00:00:00+00:00"
+  }
+]

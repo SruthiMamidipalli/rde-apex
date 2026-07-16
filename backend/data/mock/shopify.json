@@ -1,0 +1,210 @@
+[
+  {
+    "customer_id": "C001",
+    "average_order_value": 90.2,
+    "order_count_30d": 0,
+    "discount_usage_rate": 0.72,
+    "last_purchase_date": "2026-04-17T09:36:00+00:00",
+    "aov_change_pct": -67.2
+  },
+  {
+    "customer_id": "C002",
+    "average_order_value": 61.5,
+    "order_count_30d": 0,
+    "discount_usage_rate": 0.72,
+    "last_purchase_date": "2026-04-20T09:36:00+00:00",
+    "aov_change_pct": -71.2
+  },
+  {
+    "customer_id": "C003",
+    "average_order_value": 41.0,
+    "order_count_30d": 0,
+    "discount_usage_rate": 0.72,
+    "last_purchase_date": "2026-04-23T09:36:00+00:00",
+    "aov_change_pct": -75.2
+  },
+  {
+    "customer_id": "C004",
+    "average_order_value": 90.2,
+    "order_count_30d": 0,
+    "discount_usage_rate": 0.72,
+    "last_purchase_date": "2026-04-13T19:12:00+00:00",
+    "aov_change_pct": -62.4
+  },
+  {
+    "customer_id": "C005",
+    "average_order_value": 28.7,
+    "order_count_30d": 0,
+    "discount_usage_rate": 0.72,
+    "last_purchase_date": "2026-04-16T19:12:00+00:00",
+    "aov_change_pct": -66.4
+  },
+  {
+    "customer_id": "C006",
+    "average_order_value": 93.0,
+    "order_count_30d": 1,
+    "discount_usage_rate": 0.55,
+    "last_purchase_date": "2026-05-30T19:12:00+00:00",
+    "aov_change_pct": -44.4
+  },
+  {
+    "customer_id": "C007",
+    "average_order_value": 62.0,
+    "order_count_30d": 1,
+    "discount_usage_rate": 0.55,
+    "last_purchase_date": "2026-06-02T19:12:00+00:00",
+    "aov_change_pct": -48.4
+  },
+  {
+    "customer_id": "C008",
+    "average_order_value": 136.4,
+    "order_count_30d": 1,
+    "discount_usage_rate": 0.55,
+    "last_purchase_date": "2026-05-24T04:48:00+00:00",
+    "aov_change_pct": -35.6
+  },
+  {
+    "customer_id": "C009",
+    "average_order_value": 43.4,
+    "order_count_30d": 1,
+    "discount_usage_rate": 0.55,
+    "last_purchase_date": "2026-05-27T04:48:00+00:00",
+    "aov_change_pct": -39.6
+  },
+  {
+    "customer_id": "C010",
+    "average_order_value": 93.0,
+    "order_count_30d": 1,
+    "discount_usage_rate": 0.55,
+    "last_purchase_date": "2026-05-28T09:36:00+00:00",
+    "aov_change_pct": -41.2
+  },
+  {
+    "customer_id": "C011",
+    "average_order_value": 62.0,
+    "order_count_30d": 1,
+    "discount_usage_rate": 0.55,
+    "last_purchase_date": "2026-05-31T09:36:00+00:00",
+    "aov_change_pct": -45.2
+  },
+  {
+    "customer_id": "C012",
+    "average_order_value": 43.4,
+    "order_count_30d": 1,
+    "discount_usage_rate": 0.55,
+    "last_purchase_date": "2026-06-03T09:36:00+00:00",
+    "aov_change_pct": -49.2
+  },
+  {
+    "customer_id": "C013",
+    "average_order_value": 132.0,
+    "order_count_30d": 2,
+    "discount_usage_rate": 0.34,
+    "last_purchase_date": "2026-06-14T19:12:00+00:00",
+    "aov_change_pct": -12.4
+  },
+  {
+    "customer_id": "C014",
+    "average_order_value": 88.0,
+    "order_count_30d": 2,
+    "discount_usage_rate": 0.34,
+    "last_purchase_date": "2026-06-17T19:12:00+00:00",
+    "aov_change_pct": -16.4
+  },
+  {
+    "customer_id": "C015",
+    "average_order_value": 193.6,
+    "order_count_30d": 2,
+    "discount_usage_rate": 0.34,
+    "last_purchase_date": "2026-06-20T19:12:00+00:00",
+    "aov_change_pct": -20.4
+  },
+  {
+    "customer_id": "C016",
+    "average_order_value": 61.6,
+    "order_count_30d": 2,
+    "discount_usage_rate": 0.34,
+    "last_purchase_date": "2026-06-23T19:12:00+00:00",
+    "aov_change_pct": -24.4
+  },
+  {
+    "customer_id": "C017",
+    "average_order_value": 88.0,
+    "order_count_30d": 2,
+    "discount_usage_rate": 0.34,
+    "last_purchase_date": "2026-06-14T04:48:00+00:00",
+    "aov_change_pct": -11.6
+  },
+  {
+    "customer_id": "C018",
+    "average_order_value": 132.0,
+    "order_count_30d": 2,
+    "discount_usage_rate": 0.34,
+    "last_purchase_date": "2026-06-17T04:48:00+00:00",
+    "aov_change_pct": -15.6
+  },
+  {
+    "customer_id": "C019",
+    "average_order_value": 312.4,
+    "order_count_30d": 4,
+    "discount_usage_rate": 0.12,
+    "last_purchase_date": "2026-07-10T04:48:00+00:00",
+    "aov_change_pct": 10.4
+  },
+  {
+    "customer_id": "C020",
+    "average_order_value": 213.0,
+    "order_count_30d": 4,
+    "discount_usage_rate": 0.12,
+    "last_purchase_date": "2026-07-11T09:36:00+00:00",
+    "aov_change_pct": 8.8
+  },
+  {
+    "customer_id": "C021",
+    "average_order_value": 142.0,
+    "order_count_30d": 4,
+    "discount_usage_rate": 0.12,
+    "last_purchase_date": "2026-07-14T00:00:00+00:00",
+    "aov_change_pct": 4.8
+  },
+  {
+    "customer_id": "C022",
+    "average_order_value": 99.4,
+    "order_count_30d": 4,
+    "discount_usage_rate": 0.12,
+    "last_purchase_date": "2026-07-04T19:12:00+00:00",
+    "aov_change_pct": 17.6
+  },
+  {
+    "customer_id": "C023",
+    "average_order_value": 312.4,
+    "order_count_30d": 4,
+    "discount_usage_rate": 0.12,
+    "last_purchase_date": "2026-07-07T19:12:00+00:00",
+    "aov_change_pct": 13.6
+  },
+  {
+    "customer_id": "C024",
+    "average_order_value": 213.0,
+    "order_count_30d": 4,
+    "discount_usage_rate": 0.12,
+    "last_purchase_date": "2026-07-10T19:12:00+00:00",
+    "aov_change_pct": 9.6
+  },
+  {
+    "customer_id": "C025",
+    "average_order_value": 142.0,
+    "order_count_30d": 4,
+    "discount_usage_rate": 0.12,
+    "last_purchase_date": "2026-07-13T19:12:00+00:00",
+    "aov_change_pct": 5.6
+  },
+  {
+    "customer_id": "C026",
+    "average_order_value": 117.0,
+    "order_count_30d": 0,
+    "discount_usage_rate": 0.71,
+    "last_purchase_date": "2026-04-18T00:00:00+00:00",
+    "aov_change_pct": -60.0
+  }
+]

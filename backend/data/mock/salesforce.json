@@ -1,0 +1,184 @@
+[
+  {
+    "customer_id": "C001",
+    "engagement_score": 12.6,
+    "last_interaction_date": "2026-05-20T12:00:00+00:00",
+    "health_score": 15.6,
+    "lifecycle_stage": "At Risk"
+  },
+  {
+    "customer_id": "C002",
+    "engagement_score": 9.6,
+    "last_interaction_date": "2026-05-23T00:00:00+00:00",
+    "health_score": 12.6,
+    "lifecycle_stage": "At Risk"
+  },
+  {
+    "customer_id": "C003",
+    "engagement_score": 6.6,
+    "last_interaction_date": "2026-05-25T12:00:00+00:00",
+    "health_score": 9.6,
+    "lifecycle_stage": "At Risk"
+  },
+  {
+    "customer_id": "C004",
+    "engagement_score": 16.2,
+    "last_interaction_date": "2026-05-17T12:00:00+00:00",
+    "health_score": 19.2,
+    "lifecycle_stage": "At Risk"
+  },
+  {
+    "customer_id": "C005",
+    "engagement_score": 13.2,
+    "last_interaction_date": "2026-05-20T00:00:00+00:00",
+    "health_score": 16.2,
+    "lifecycle_stage": "At Risk"
+  },
+  {
+    "customer_id": "C006",
+    "engagement_score": 32.2,
+    "last_interaction_date": "2026-06-14T12:00:00+00:00",
+    "health_score": 36.2,
+    "lifecycle_stage": "Declining"
+  },
+  {
+    "customer_id": "C007",
+    "engagement_score": 29.2,
+    "last_interaction_date": "2026-06-17T00:00:00+00:00",
+    "health_score": 33.2,
+    "lifecycle_stage": "Declining"
+  },
+  {
+    "customer_id": "C008",
+    "engagement_score": 38.8,
+    "last_interaction_date": "2026-06-09T00:00:00+00:00",
+    "health_score": 42.8,
+    "lifecycle_stage": "Declining"
+  },
+  {
+    "customer_id": "C009",
+    "engagement_score": 35.8,
+    "last_interaction_date": "2026-06-11T12:00:00+00:00",
+    "health_score": 39.8,
+    "lifecycle_stage": "Declining"
+  },
+  {
+    "customer_id": "C010",
+    "engagement_score": 34.6,
+    "last_interaction_date": "2026-06-12T12:00:00+00:00",
+    "health_score": 38.6,
+    "lifecycle_stage": "Declining"
+  },
+  {
+    "customer_id": "C011",
+    "engagement_score": 31.6,
+    "last_interaction_date": "2026-06-15T00:00:00+00:00",
+    "health_score": 35.6,
+    "lifecycle_stage": "Declining"
+  },
+  {
+    "customer_id": "C012",
+    "engagement_score": 28.6,
+    "last_interaction_date": "2026-06-17T12:00:00+00:00",
+    "health_score": 32.6,
+    "lifecycle_stage": "Declining"
+  },
+  {
+    "customer_id": "C013",
+    "engagement_score": 59.2,
+    "last_interaction_date": "2026-06-23T12:00:00+00:00",
+    "health_score": 62.2,
+    "lifecycle_stage": "Engaged"
+  },
+  {
+    "customer_id": "C014",
+    "engagement_score": 56.2,
+    "last_interaction_date": "2026-06-26T00:00:00+00:00",
+    "health_score": 59.2,
+    "lifecycle_stage": "Engaged"
+  },
+  {
+    "customer_id": "C015",
+    "engagement_score": 53.2,
+    "last_interaction_date": "2026-06-28T12:00:00+00:00",
+    "health_score": 56.2,
+    "lifecycle_stage": "Engaged"
+  },
+  {
+    "customer_id": "C016",
+    "engagement_score": 50.2,
+    "last_interaction_date": "2026-07-01T00:00:00+00:00",
+    "health_score": 53.2,
+    "lifecycle_stage": "Engaged"
+  },
+  {
+    "customer_id": "C017",
+    "engagement_score": 59.8,
+    "last_interaction_date": "2026-06-23T00:00:00+00:00",
+    "health_score": 62.8,
+    "lifecycle_stage": "Engaged"
+  },
+  {
+    "customer_id": "C018",
+    "engagement_score": 56.8,
+    "last_interaction_date": "2026-06-25T12:00:00+00:00",
+    "health_score": 59.8,
+    "lifecycle_stage": "Engaged"
+  },
+  {
+    "customer_id": "C019",
+    "engagement_score": 80.8,
+    "last_interaction_date": "2026-07-12T00:00:00+00:00",
+    "health_score": 84.8,
+    "lifecycle_stage": "Champion"
+  },
+  {
+    "customer_id": "C020",
+    "engagement_score": 79.6,
+    "last_interaction_date": "2026-07-13T00:00:00+00:00",
+    "health_score": 83.6,
+    "lifecycle_stage": "Champion"
+  },
+  {
+    "customer_id": "C021",
+    "engagement_score": 76.6,
+    "last_interaction_date": "2026-07-14T00:00:00+00:00",
+    "health_score": 80.6,
+    "lifecycle_stage": "Champion"
+  },
+  {
+    "customer_id": "C022",
+    "engagement_score": 86.2,
+    "last_interaction_date": "2026-07-07T12:00:00+00:00",
+    "health_score": 90.2,
+    "lifecycle_stage": "Champion"
+  },
+  {
+    "customer_id": "C023",
+    "engagement_score": 83.2,
+    "last_interaction_date": "2026-07-10T00:00:00+00:00",
+    "health_score": 87.2,
+    "lifecycle_stage": "Champion"
+  },
+  {
+    "customer_id": "C024",
+    "engagement_score": 80.2,
+    "last_interaction_date": "2026-07-12T12:00:00+00:00",
+    "health_score": 84.2,
+    "lifecycle_stage": "Champion"
+  },
+  {
+    "customer_id": "C025",
+    "engagement_score": 77.2,
+    "last_interaction_date": "2026-07-14T00:00:00+00:00",
+    "health_score": 81.2,
+    "lifecycle_stage": "Champion"
+  },
+  {
+    "customer_id": "C026",
+    "engagement_score": 70.0,
+    "last_interaction_date": "2026-06-24T00:00:00+00:00",
+    "health_score": 72.0,
+    "lifecycle_stage": "Engaged"
+  }
+]

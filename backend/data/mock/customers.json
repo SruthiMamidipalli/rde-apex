@@ -1,0 +1,210 @@
+[
+  {
+    "customer_id": "C001",
+    "name": "Marcus Chen",
+    "email": "marcus.chen@example.com",
+    "tier": "Platinum",
+    "join_date": "2023-06-21T00:00:00+00:00",
+    "ltv": 7038.0
+  },
+  {
+    "customer_id": "C002",
+    "name": "Priya Nair",
+    "email": "priya.nair@example.com",
+    "tier": "Gold",
+    "join_date": "2024-02-06T00:00:00+00:00",
+    "ltv": 2752.0
+  },
+  {
+    "customer_id": "C003",
+    "name": "David Okafor",
+    "email": "david.okafor@example.com",
+    "tier": "Silver",
+    "join_date": "2024-10-13T00:00:00+00:00",
+    "ltv": 993.25
+  },
+  {
+    "customer_id": "C004",
+    "name": "Elena Volkova",
+    "email": "elena.volkova@example.com",
+    "tier": "Platinum",
+    "join_date": "2022-07-26T00:00:00+00:00",
+    "ltv": 8466.0
+  },
+  {
+    "customer_id": "C005",
+    "name": "James Sullivan",
+    "email": "james.sullivan@example.com",
+    "tier": "Bronze",
+    "join_date": "2025-12-17T00:00:00+00:00",
+    "ltv": 663.4
+  },
+  {
+    "customer_id": "C006",
+    "name": "Aisha Rahman",
+    "email": "aisha.rahman@example.com",
+    "tier": "Gold",
+    "join_date": "2024-07-25T00:00:00+00:00",
+    "ltv": 2864.0
+  },
+  {
+    "customer_id": "C007",
+    "name": "Tom Baker",
+    "email": "tom.baker@example.com",
+    "tier": "Silver",
+    "join_date": "2025-01-21T00:00:00+00:00",
+    "ltv": 1044.0
+  },
+  {
+    "customer_id": "C008",
+    "name": "Sofia Rossi",
+    "email": "sofia.rossi@example.com",
+    "tier": "Platinum",
+    "join_date": "2023-11-08T00:00:00+00:00",
+    "ltv": 8704.0
+  },
+  {
+    "customer_id": "C009",
+    "name": "Liam Murphy",
+    "email": "liam.murphy@example.com",
+    "tier": "Bronze",
+    "join_date": "2025-09-18T00:00:00+00:00",
+    "ltv": 685.1
+  },
+  {
+    "customer_id": "C010",
+    "name": "Yuki Tanaka",
+    "email": "yuki.tanaka@example.com",
+    "tier": "Gold",
+    "join_date": "2024-09-23T00:00:00+00:00",
+    "ltv": 3312.0
+  },
+  {
+    "customer_id": "C011",
+    "name": "Fatima Al-Sayed",
+    "email": "fatima.alsayed@example.com",
+    "tier": "Silver",
+    "join_date": "2025-03-22T00:00:00+00:00",
+    "ltv": 1247.0
+  },
+  {
+    "customer_id": "C012",
+    "name": "Carlos Mendez",
+    "email": "carlos.mendez@example.com",
+    "tier": "Bronze",
+    "join_date": "2026-01-06T00:00:00+00:00",
+    "ltv": 424.7
+  },
+  {
+    "customer_id": "C013",
+    "name": "Nina Kowalski",
+    "email": "nina.kowalski@example.com",
+    "tier": "Gold",
+    "join_date": "2024-11-12T00:00:00+00:00",
+    "ltv": 3984.0
+  },
+  {
+    "customer_id": "C014",
+    "name": "Raj Patel",
+    "email": "raj.patel@example.com",
+    "tier": "Silver",
+    "join_date": "2025-05-11T00:00:00+00:00",
+    "ltv": 1551.5
+  },
+  {
+    "customer_id": "C015",
+    "name": "Grace Kim",
+    "email": "grace.kim@example.com",
+    "tier": "Platinum",
+    "join_date": "2023-09-19T00:00:00+00:00",
+    "ltv": 6086.0
+  },
+  {
+    "customer_id": "C016",
+    "name": "Omar Farouk",
+    "email": "omar.farouk@example.com",
+    "tier": "Bronze",
+    "join_date": "2025-10-28T00:00:00+00:00",
+    "ltv": 446.4
+  },
+  {
+    "customer_id": "C017",
+    "name": "Isabella Santos",
+    "email": "isabella.santos@example.com",
+    "tier": "Silver",
+    "join_date": "2025-03-02T00:00:00+00:00",
+    "ltv": 1856.0
+  },
+  {
+    "customer_id": "C018",
+    "name": "Wei Zhang",
+    "email": "wei.zhang@example.com",
+    "tier": "Gold",
+    "join_date": "2024-08-14T00:00:00+00:00",
+    "ltv": 3536.0
+  },
+  {
+    "customer_id": "C019",
+    "name": "Hannah Schmidt",
+    "email": "hannah.schmidt@example.com",
+    "tier": "Platinum",
+    "join_date": "2023-04-02T00:00:00+00:00",
+    "ltv": 6324.0
+  },
+  {
+    "customer_id": "C020",
+    "name": "Leo Ferreira",
+    "email": "leo.ferreira@example.com",
+    "tier": "Gold",
+    "join_date": "2024-06-25T00:00:00+00:00",
+    "ltv": 2752.0
+  },
+  {
+    "customer_id": "C021",
+    "name": "Maya Johnson",
+    "email": "maya.johnson@example.com",
+    "tier": "Silver",
+    "join_date": "2025-02-10T00:00:00+00:00",
+    "ltv": 993.25
+  },
+  {
+    "customer_id": "C022",
+    "name": "Ahmed Hassan",
+    "email": "ahmed.hassan@example.com",
+    "tier": "Bronze",
+    "join_date": "2025-08-09T00:00:00+00:00",
+    "ltv": 771.9
+  },
+  {
+    "customer_id": "C023",
+    "name": "Chloe Dubois",
+    "email": "chloe.dubois@example.com",
+    "tier": "Platinum",
+    "join_date": "2022-11-13T00:00:00+00:00",
+    "ltv": 7276.0
+  },
+  {
+    "customer_id": "C024",
+    "name": "Noah Williams",
+    "email": "noah.williams@example.com",
+    "tier": "Gold",
+    "join_date": "2024-04-16T00:00:00+00:00",
+    "ltv": 2864.0
+  },
+  {
+    "customer_id": "C025",
+    "name": "Sara Lindqvist",
+    "email": "sara.lindqvist@example.com",
+    "tier": "Silver",
+    "join_date": "2025-04-01T00:00:00+00:00",
+    "ltv": 1044.0
+  },
+  {
+    "customer_id": "C026",
+    "name": "Eleanor Voss",
+    "email": "eleanor.voss@example.com",
+    "tier": "Gold",
+    "join_date": "2024-06-15T00:00:00+00:00",
+    "ltv": 4096.0
+  }
+]

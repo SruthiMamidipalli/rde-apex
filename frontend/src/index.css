@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-apex-bg text-apex-text antialiased;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+}
+
+/* Custom scrollbar (matches reference) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #232840;
+  border-radius: 3px;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-[10px] border border-apex-border bg-apex-surface;
+  }
+  .panel-header {
+    @apply flex items-center gap-2 border-b border-apex-border px-4 py-3;
+  }
+  .panel-title {
+    @apply flex-1 text-xs font-bold text-apex-text;
+  }
+  .card-hover {
+    @apply transition-colors hover:border-apex-accent;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-apex-border bg-apex-surface2 px-3.5 py-1.5 text-xs font-medium text-apex-text transition-all hover:border-apex-accent hover:bg-apex-surface3 disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border-apex-accent bg-apex-accent text-white hover:bg-apex-accent hover:opacity-90;
+  }
+  .chip {
+    @apply cursor-pointer rounded-full border border-apex-border bg-apex-surface2 px-2.5 py-1 text-[10px] text-apex-muted transition-all hover:border-apex-accent hover:text-apex-accent;
+  }
+  .label-caps {
+    @apply text-[10px] font-semibold uppercase tracking-[0.08em] text-apex-muted;
+  }
+  .stat-value {
+    @apply text-[26px] font-extrabold tracking-tight;
+  }
+  .tag {
+    @apply rounded-[3px] bg-apex-surface3 px-1.5 py-0.5 text-[10px] text-apex-muted;
+  }
+}

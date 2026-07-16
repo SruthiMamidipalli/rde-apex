@@ -1,0 +1,210 @@
+[
+  {
+    "customer_id": "C001",
+    "points_balance": 7040,
+    "points_earned_30d": 0,
+    "redemptions_30d": 0,
+    "tier": "Platinum",
+    "days_since_last_redemption": 140
+  },
+  {
+    "customer_id": "C002",
+    "points_balance": 4800,
+    "points_earned_30d": 0,
+    "redemptions_30d": 0,
+    "tier": "Gold",
+    "days_since_last_redemption": 136
+  },
+  {
+    "customer_id": "C003",
+    "points_balance": 3200,
+    "points_earned_30d": 0,
+    "redemptions_30d": 0,
+    "tier": "Silver",
+    "days_since_last_redemption": 132
+  },
+  {
+    "customer_id": "C004",
+    "points_balance": 7040,
+    "points_earned_30d": 0,
+    "redemptions_30d": 0,
+    "tier": "Platinum",
+    "days_since_last_redemption": 145
+  },
+  {
+    "customer_id": "C005",
+    "points_balance": 2240,
+    "points_earned_30d": 0,
+    "redemptions_30d": 0,
+    "tier": "Bronze",
+    "days_since_last_redemption": 141
+  },
+  {
+    "customer_id": "C006",
+    "points_balance": 2700,
+    "points_earned_30d": 180,
+    "redemptions_30d": 0,
+    "tier": "Gold",
+    "days_since_last_redemption": 82
+  },
+  {
+    "customer_id": "C007",
+    "points_balance": 1800,
+    "points_earned_30d": 120,
+    "redemptions_30d": 0,
+    "tier": "Silver",
+    "days_since_last_redemption": 78
+  },
+  {
+    "customer_id": "C008",
+    "points_balance": 3960,
+    "points_earned_30d": 264,
+    "redemptions_30d": 0,
+    "tier": "Platinum",
+    "days_since_last_redemption": 91
+  },
+  {
+    "customer_id": "C009",
+    "points_balance": 1260,
+    "points_earned_30d": 84,
+    "redemptions_30d": 0,
+    "tier": "Bronze",
+    "days_since_last_redemption": 87
+  },
+  {
+    "customer_id": "C010",
+    "points_balance": 2700,
+    "points_earned_30d": 180,
+    "redemptions_30d": 0,
+    "tier": "Gold",
+    "days_since_last_redemption": 85
+  },
+  {
+    "customer_id": "C011",
+    "points_balance": 1800,
+    "points_earned_30d": 120,
+    "redemptions_30d": 0,
+    "tier": "Silver",
+    "days_since_last_redemption": 81
+  },
+  {
+    "customer_id": "C012",
+    "points_balance": 1260,
+    "points_earned_30d": 84,
+    "redemptions_30d": 0,
+    "tier": "Bronze",
+    "days_since_last_redemption": 77
+  },
+  {
+    "customer_id": "C013",
+    "points_balance": 1425,
+    "points_earned_30d": 480,
+    "redemptions_30d": 1,
+    "tier": "Gold",
+    "days_since_last_redemption": 53
+  },
+  {
+    "customer_id": "C014",
+    "points_balance": 950,
+    "points_earned_30d": 320,
+    "redemptions_30d": 1,
+    "tier": "Silver",
+    "days_since_last_redemption": 49
+  },
+  {
+    "customer_id": "C015",
+    "points_balance": 2090,
+    "points_earned_30d": 704,
+    "redemptions_30d": 1,
+    "tier": "Platinum",
+    "days_since_last_redemption": 45
+  },
+  {
+    "customer_id": "C016",
+    "points_balance": 665,
+    "points_earned_30d": 224,
+    "redemptions_30d": 1,
+    "tier": "Bronze",
+    "days_since_last_redemption": 41
+  },
+  {
+    "customer_id": "C017",
+    "points_balance": 950,
+    "points_earned_30d": 320,
+    "redemptions_30d": 1,
+    "tier": "Silver",
+    "days_since_last_redemption": 54
+  },
+  {
+    "customer_id": "C018",
+    "points_balance": 1425,
+    "points_earned_30d": 480,
+    "redemptions_30d": 1,
+    "tier": "Gold",
+    "days_since_last_redemption": 50
+  },
+  {
+    "customer_id": "C019",
+    "points_balance": 528,
+    "points_earned_30d": 1716,
+    "redemptions_30d": 3,
+    "tier": "Platinum",
+    "days_since_last_redemption": 7
+  },
+  {
+    "customer_id": "C020",
+    "points_balance": 360,
+    "points_earned_30d": 1170,
+    "redemptions_30d": 3,
+    "tier": "Gold",
+    "days_since_last_redemption": 5
+  },
+  {
+    "customer_id": "C021",
+    "points_balance": 240,
+    "points_earned_30d": 780,
+    "redemptions_30d": 3,
+    "tier": "Silver",
+    "days_since_last_redemption": 1
+  },
+  {
+    "customer_id": "C022",
+    "points_balance": 168,
+    "points_earned_30d": 546,
+    "redemptions_30d": 3,
+    "tier": "Bronze",
+    "days_since_last_redemption": 14
+  },
+  {
+    "customer_id": "C023",
+    "points_balance": 528,
+    "points_earned_30d": 1716,
+    "redemptions_30d": 3,
+    "tier": "Platinum",
+    "days_since_last_redemption": 10
+  },
+  {
+    "customer_id": "C024",
+    "points_balance": 360,
+    "points_earned_30d": 1170,
+    "redemptions_30d": 3,
+    "tier": "Gold",
+    "days_since_last_redemption": 6
+  },
+  {
+    "customer_id": "C025",
+    "points_balance": 240,
+    "points_earned_30d": 780,
+    "redemptions_30d": 3,
+    "tier": "Silver",
+    "days_since_last_redemption": 2
+  },
+  {
+    "customer_id": "C026",
+    "points_balance": 6150,
+    "points_earned_30d": 0,
+    "redemptions_30d": 0,
+    "tier": "Gold",
+    "days_since_last_redemption": 122
+  }
+]

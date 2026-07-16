@@ -1,0 +1,227 @@
+[
+  {
+    "customer_id": "C001",
+    "sessions_30d": 1,
+    "sessions_prev_30d": 22,
+    "avg_session_duration_sec": 38.0,
+    "pages_per_session": 1.2,
+    "bounce_rate": 0.88,
+    "session_change_pct": -94.4
+  },
+  {
+    "customer_id": "C002",
+    "sessions_30d": 1,
+    "sessions_prev_30d": 22,
+    "avg_session_duration_sec": 38.0,
+    "pages_per_session": 1.2,
+    "bounce_rate": 0.86,
+    "session_change_pct": -97.4
+  },
+  {
+    "customer_id": "C003",
+    "sessions_30d": 1,
+    "sessions_prev_30d": 22,
+    "avg_session_duration_sec": 38.0,
+    "pages_per_session": 1.2,
+    "bounce_rate": 0.84,
+    "session_change_pct": -100.4
+  },
+  {
+    "customer_id": "C004",
+    "sessions_30d": 1,
+    "sessions_prev_30d": 22,
+    "avg_session_duration_sec": 38.0,
+    "pages_per_session": 1.2,
+    "bounce_rate": 0.91,
+    "session_change_pct": -90.8
+  },
+  {
+    "customer_id": "C005",
+    "sessions_30d": 1,
+    "sessions_prev_30d": 22,
+    "avg_session_duration_sec": 38.0,
+    "pages_per_session": 1.2,
+    "bounce_rate": 0.89,
+    "session_change_pct": -93.8
+  },
+  {
+    "customer_id": "C006",
+    "sessions_30d": 5,
+    "sessions_prev_30d": 18,
+    "avg_session_duration_sec": 74.0,
+    "pages_per_session": 2.1,
+    "bounce_rate": 0.65,
+    "session_change_pct": -61.8
+  },
+  {
+    "customer_id": "C007",
+    "sessions_30d": 5,
+    "sessions_prev_30d": 18,
+    "avg_session_duration_sec": 74.0,
+    "pages_per_session": 2.1,
+    "bounce_rate": 0.63,
+    "session_change_pct": -64.8
+  },
+  {
+    "customer_id": "C008",
+    "sessions_30d": 5,
+    "sessions_prev_30d": 18,
+    "avg_session_duration_sec": 74.0,
+    "pages_per_session": 2.1,
+    "bounce_rate": 0.69,
+    "session_change_pct": -55.2
+  },
+  {
+    "customer_id": "C009",
+    "sessions_30d": 5,
+    "sessions_prev_30d": 18,
+    "avg_session_duration_sec": 74.0,
+    "pages_per_session": 2.1,
+    "bounce_rate": 0.67,
+    "session_change_pct": -58.2
+  },
+  {
+    "customer_id": "C010",
+    "sessions_30d": 5,
+    "sessions_prev_30d": 18,
+    "avg_session_duration_sec": 74.0,
+    "pages_per_session": 2.1,
+    "bounce_rate": 0.66,
+    "session_change_pct": -59.4
+  },
+  {
+    "customer_id": "C011",
+    "sessions_30d": 5,
+    "sessions_prev_30d": 18,
+    "avg_session_duration_sec": 74.0,
+    "pages_per_session": 2.1,
+    "bounce_rate": 0.64,
+    "session_change_pct": -62.4
+  },
+  {
+    "customer_id": "C012",
+    "sessions_30d": 5,
+    "sessions_prev_30d": 18,
+    "avg_session_duration_sec": 74.0,
+    "pages_per_session": 2.1,
+    "bounce_rate": 0.62,
+    "session_change_pct": -65.4
+  },
+  {
+    "customer_id": "C013",
+    "sessions_30d": 11,
+    "sessions_prev_30d": 16,
+    "avg_session_duration_sec": 132.0,
+    "pages_per_session": 3.4,
+    "bounce_rate": 0.47,
+    "session_change_pct": -23.8
+  },
+  {
+    "customer_id": "C014",
+    "sessions_30d": 11,
+    "sessions_prev_30d": 16,
+    "avg_session_duration_sec": 132.0,
+    "pages_per_session": 3.4,
+    "bounce_rate": 0.45,
+    "session_change_pct": -26.8
+  },
+  {
+    "customer_id": "C015",
+    "sessions_30d": 11,
+    "sessions_prev_30d": 16,
+    "avg_session_duration_sec": 132.0,
+    "pages_per_session": 3.4,
+    "bounce_rate": 0.43,
+    "session_change_pct": -29.8
+  },
+  {
+    "customer_id": "C017",
+    "sessions_30d": 11,
+    "sessions_prev_30d": 16,
+    "avg_session_duration_sec": 132.0,
+    "pages_per_session": 3.4,
+    "bounce_rate": 0.47,
+    "session_change_pct": -23.2
+  },
+  {
+    "customer_id": "C018",
+    "sessions_30d": 11,
+    "sessions_prev_30d": 16,
+    "avg_session_duration_sec": 132.0,
+    "pages_per_session": 3.4,
+    "bounce_rate": 0.45,
+    "session_change_pct": -26.2
+  },
+  {
+    "customer_id": "C019",
+    "sessions_30d": 24,
+    "sessions_prev_30d": 21,
+    "avg_session_duration_sec": 268.0,
+    "pages_per_session": 5.8,
+    "bounce_rate": 0.21,
+    "session_change_pct": 12.8
+  },
+  {
+    "customer_id": "C020",
+    "sessions_30d": 24,
+    "sessions_prev_30d": 21,
+    "avg_session_duration_sec": 268.0,
+    "pages_per_session": 5.8,
+    "bounce_rate": 0.2,
+    "session_change_pct": 11.6
+  },
+  {
+    "customer_id": "C021",
+    "sessions_30d": 24,
+    "sessions_prev_30d": 21,
+    "avg_session_duration_sec": 268.0,
+    "pages_per_session": 5.8,
+    "bounce_rate": 0.18,
+    "session_change_pct": 8.6
+  },
+  {
+    "customer_id": "C022",
+    "sessions_30d": 24,
+    "sessions_prev_30d": 21,
+    "avg_session_duration_sec": 268.0,
+    "pages_per_session": 5.8,
+    "bounce_rate": 0.25,
+    "session_change_pct": 18.2
+  },
+  {
+    "customer_id": "C023",
+    "sessions_30d": 24,
+    "sessions_prev_30d": 21,
+    "avg_session_duration_sec": 268.0,
+    "pages_per_session": 5.8,
+    "bounce_rate": 0.23,
+    "session_change_pct": 15.2
+  },
+  {
+    "customer_id": "C024",
+    "sessions_30d": 24,
+    "sessions_prev_30d": 21,
+    "avg_session_duration_sec": 268.0,
+    "pages_per_session": 5.8,
+    "bounce_rate": 0.21,
+    "session_change_pct": 12.2
+  },
+  {
+    "customer_id": "C025",
+    "sessions_30d": 24,
+    "sessions_prev_30d": 21,
+    "avg_session_duration_sec": 268.0,
+    "pages_per_session": 5.8,
+    "bounce_rate": 0.19,
+    "session_change_pct": 9.2
+  },
+  {
+    "customer_id": "C026",
+    "sessions_30d": 4,
+    "sessions_prev_30d": 10,
+    "avg_session_duration_sec": 41.0,
+    "pages_per_session": 1.4,
+    "bounce_rate": 0.85,
+    "session_change_pct": -60.0
+  }
+]

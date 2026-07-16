@@ -66,34 +66,84 @@ class ChatbotService:
         return facts
 
     # ------------------------------------------------------------------ #
+    # Tools the assistant can call (real function-calling loop).
+    def _tool_schemas(self) -> list[dict]:
+        return [
+            {"name": "get_top_at_risk",
+             "description": "Get today's top at-risk customers ranked by risk × value.",
+             "input_schema": {"type": "object", "properties": {
+                 "limit": {"type": "integer", "description": "How many (default 10)."}}}},
+            {"name": "explain_customer",
+             "description": "Explain why a specific customer is at risk — top signals, "
+                            "interaction boost, and CRM divergence. Use the currently selected "
+                            "customer if no id is given.",
+             "input_schema": {"type": "object", "properties": {
+                 "customer_id": {"type": "string"}}}},
+            {"name": "get_cost_summary",
+             "description": "Get AI model cost so far: total, all-Sonnet baseline, savings, "
+                            "and per-model breakdown.",
+             "input_schema": {"type": "object", "properties": {}}},
+            {"name": "get_pending_approvals",
+             "description": "Get how many approvals are pending and the oldest one.",
+             "input_schema": {"type": "object", "properties": {}}},
+        ]
+
+    def _tool_executor(self, context: dict):
+        def run(name: str, inp: dict):
+            inp = inp or {}
+            if name == "get_top_at_risk":
+                facts = self._live_context(context)
+                rows = facts["top_at_risk"][: int(inp.get("limit", 10))]
+                # Do not expose raw customer IDs in assistant-facing output.
+                return [{k: v for k, v in r.items() if k != "customer_id"} for r in rows]
+            if name == "explain_customer":
+                cid = inp.get("customer_id") or context.get("customer_id")
+                return {"explanation": self._explain_customer(cid)}
+            if name == "get_cost_summary":
+                return self.orch.router.get_cost_summary()
+            if name == "get_pending_approvals":
+                pend = self.orch.approvals.get_pending()
+                oldest = (max(pend, key=lambda p: p.time_since_signal_seconds)
+                          .workflow_result.customer_id if pend else None)
+                return {"pending": len(pend), "oldest_customer_id": oldest}
+            return {"error": f"unknown tool {name}"}
+        return run
+
     def answer(self, message: str, context: dict | None = None) -> dict:
         context = context or {}
-        facts = self._live_context(context)
         tier = self._complexity(message)
 
-        # Try the LLM path (routed by complexity) when Bedrock is available.
+        # Real tool-using agent loop when Bedrock is available.
         if self.orch.router.available:
             try:
                 task = "analyze_churn_drivers" if tier == "complex" else "summarize_signals"
+                page = context.get("page", "Overview")
                 system = (
-                    "You are the Apex Retention AI assistant. Answer ONLY from the "
-                    "provided live facts. Cite source systems in [brackets] like "
-                    "[GA], [Yotpo], [Audit]. Never invent numbers. Be concise. The "
-                    "user is on the '" + str(facts["current_page"]) + "' page."
+                    "You are the Apex Retention AI assistant. Use the provided tools to fetch "
+                    "live, real data before answering — never invent numbers. Cite source systems "
+                    "in [brackets] like [GA], [Yotpo], [Audit]. Be concise. The user is on the "
+                    f"'{page}' page"
+                    + (f", viewing customer {context['customer_id']}." if context.get("customer_id") else ".")
                 )
-                user = json.dumps({"question": message, "facts": facts}, default=str)
-                result = self.orch.router.invoke(task, system, user, max_tokens=600)
-                return {
-                    "reply": result["content"],
-                    "model": result["model_used"],
-                    "grounded": True,
-                    "context_used": {"page": facts["current_page"],
-                                     "customer_id": facts["selected_customer"]},
-                }
+                result = self.orch.router.invoke_with_tools(
+                    task, system, message,
+                    tools=self._tool_schemas(),
+                    tool_executor=self._tool_executor(context),
+                    max_tokens=700,
+                )
+                if result.get("content"):
+                    return {
+                        "reply": result["content"],
+                        "model": result["model_used"],
+                        "grounded": True,
+                        "tools_used": result.get("tool_calls", []),
+                        "context_used": {"page": page, "customer_id": context.get("customer_id")},
+                    }
             except Exception as exc:  # noqa: BLE001
-                logger.warning("Chatbot LLM path failed (%s); deterministic reply", exc)
+                logger.warning("Chatbot tool-use path failed (%s); deterministic reply", exc)
 
         # Deterministic grounded fallback.
+        facts = self._live_context(context)
         return {
             "reply": self._deterministic(message, facts, context),
             "model": "deterministic",
@@ -176,7 +226,7 @@ class ChatbotService:
                "shopify": "Shopify", "klaviyo": "Klaviyo", "salesforce": "CRM"}
         lines = [f"• {c.signal_name} → risk {c.normalized_score:.0f}/100 "
                  f"[{src.get(c.source, c.source)}]" for c in top]
-        out = (f"{p.name} #{customer_id} scores {s.composite_score:.0f} "
+        out = (f"{p.name} scores {s.composite_score:.0f} "
                f"({s.risk_level.value}) driven by:\n" + "\n".join(lines))
         if s.interaction_boost_applied:
             out += (f"\nInteraction boost applied (+{s.interaction_boost:.0f}): "

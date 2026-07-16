@@ -12,6 +12,7 @@ back to deterministic generation.
 
 from __future__ import annotations
 
+import json
 import logging
 from enum import Enum
 
@@ -115,6 +116,71 @@ class ModelRouter:
             return self._call(
                 task_name, fallback, system_prompt, user_message, max_tokens, fell_back=True
             )
+
+    def invoke_with_tools(
+        self,
+        task_name: str,
+        system_prompt: str,
+        user_message: str,
+        tools: list[dict],
+        tool_executor,
+        max_tokens: int = 1500,
+        max_iters: int = 5,
+    ) -> dict:
+        """Run a real tool-use (function-calling) agent loop against Bedrock.
+
+        `tools` is a list of Anthropic tool schemas; `tool_executor(name, input)`
+        runs a tool and returns a JSON-serialisable result. The model may call
+        tools across several turns; we loop until it stops requesting tools (or
+        we hit max_iters), then return the final text. Raises RuntimeError in
+        degraded mode so callers fall back to deterministic generation.
+        """
+        if self._client is None:
+            raise RuntimeError("Bedrock client unavailable (degraded mode)")
+
+        tier = self._tier_for(task_name)
+        model_id = (
+            settings.BEDROCK_MODEL_HEAVY if tier is ModelTier.SONNET
+            else settings.BEDROCK_MODEL_LIGHT
+        )
+        messages = [{"role": "user", "content": user_message}]
+        tool_calls: list[str] = []
+
+        for _ in range(max_iters):
+            resp = self._client.messages.create(
+                model=model_id,
+                max_tokens=max_tokens,
+                system=system_prompt,
+                tools=tools,
+                messages=messages,
+            )
+            self.record_usage(task_name, tier, resp.usage.input_tokens, resp.usage.output_tokens)
+
+            if resp.stop_reason != "tool_use":
+                text = "".join(b.text for b in resp.content if b.type == "text")
+                return {"content": text, "model_used": model_id, "tier": tier.value,
+                        "tool_calls": tool_calls}
+
+            # Execute every tool the model asked for this turn.
+            messages.append({"role": "assistant", "content": resp.content})
+            results = []
+            for block in resp.content:
+                if block.type == "tool_use":
+                    tool_calls.append(block.name)
+                    try:
+                        out = tool_executor(block.name, block.input)
+                    except Exception as exc:  # noqa: BLE001
+                        out = {"error": str(exc)}
+                    results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": json.dumps(out, default=str),
+                    })
+            messages.append({"role": "user", "content": results})
+
+        # Ran out of iterations — return best-effort final text.
+        return {"content": "", "model_used": model_id, "tier": tier.value,
+                "tool_calls": tool_calls, "exhausted": True}
 
     def _call(
         self,

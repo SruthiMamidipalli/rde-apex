@@ -54,12 +54,18 @@ class Orchestrator:
         self.scoring = ChurnScoreEngine()
         self.router = ModelRouter(_build_bedrock_client())
         self.agent = RetentionAgentService(self.router, self.scoring)
+        # Real LangGraph multi-agent orchestrator (wraps self.agent for typed
+        # output + deterministic fallback). Built lazily-safe below.
+        from services.agent_graph import RetentionAgentGraph
+        self.agent_graph = RetentionAgentGraph(self.router, self.agent)
         self.audit = AuditService()
         self.approvals = ApprovalService(self.audit)
 
         # customer_id -> latest score / workflow.
         self._scores: dict[str, ChurnScoreResult] = {}
         self._workflows: dict[str, RetentionWorkflowResult] = {}
+        # customer_id -> agent control-flow decision (reject/escalate/trace).
+        self._workflow_meta: dict[str, dict] = {}
 
         # KPI + chatbot services (constructed lazily to avoid import cycles).
         from services.kpi_service import KpiService
@@ -100,15 +106,19 @@ class Orchestrator:
         if profile is None:
             return None
         score = self.get_score(customer_id)
-        result = self.agent.run_retention_workflow(profile, score)
+        # Run the real LangGraph multi-agent orchestrator. It returns the typed
+        # workflow result plus the agents' control-flow decisions.
+        result, decision = self.agent_graph.run(profile, score)
         self._workflows[customer_id] = result
-        # Only route to human approval for genuinely at-risk customers. LOW-risk
-        # customers don't need an intervention, so they never enter the queue
-        # (keeps the "LOW-risk costs $0 / no action" model honest).
-        if submit and score.risk_level is not RiskLevel.LOW:
-            # time_since_signal simulates detection->delivery latency.
+        self._workflow_meta[customer_id] = decision
+        # Honor the Conflict Detector's decision: a rejected case never enters
+        # the approval queue (the agent judged intervention unwarranted).
+        if submit and not decision.get("rejected"):
             self.approvals.submit_for_approval(result, time_since_signal_seconds=result.elapsed_seconds)
         return result
+
+    def get_workflow_meta(self, customer_id: str) -> dict:
+        return self._workflow_meta.get(customer_id, {})
 
     def get_workflow(self, customer_id: str) -> RetentionWorkflowResult | None:
         return self._workflows.get(customer_id)

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apex Retention Intelligence Platform</title>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #151820;
+    --surface2: #1c2030;
+    --surface3: #232840;
+    --border: #2a3050;
+    --text: #e8eaf2;
+    --muted: #7a82a0;
+    --accent: #4f6ef7;
+    --accent2: #6ee7b7;
+    --red: #f87171;
+    --orange: #fb923c;
+    --yellow: #fbbf24;
+    --green: #34d399;
+    --amber: #f59e0b;
+    --font: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 220px; min-width: 220px; background: var(--surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; padding: 0; overflow: hidden;
+  }
+  .logo {
+    padding: 18px 18px 14px; border-bottom: 1px solid var(--border);
+    font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+  }
+  .logo span { display: block; font-size: 9px; color: var(--muted); font-weight: 400; letter-spacing: .08em; margin-top: 2px; }
+  .nav { flex: 1; padding: 10px 0; overflow-y: auto; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 18px;
+    cursor: pointer; color: var(--muted); font-size: 12px; font-weight: 500;
+    transition: all .15s; border-left: 3px solid transparent;
+  }
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--text); background: var(--surface2); border-left-color: var(--accent); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; border-radius: 99px; padding: 1px 6px; }
+  .nav-section { padding: 14px 18px 4px; font-size: 9px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+  .sidebar-footer { padding: 14px 18px; border-top: 1px solid var(--border); }
+  .user-pill { display: flex; align-items: center; gap: 9px; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-role { font-size: 10px; color: var(--muted); }
+
+  /* ── Main ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── Topbar ── */
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 52px; display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+  }
+  .topbar-title { font-size: 15px; font-weight: 700; flex: 1; }
+  .topbar-sub { font-size: 11px; color: var(--muted); margin-left: 8px; font-weight: 400; }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+  .btn {
+    padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: var(--surface3); border-color: var(--accent); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: .9; background: var(--accent); }
+  .time-chip { font-size: 11px; color: var(--muted); padding: 4px 10px; background: var(--surface2); border-radius: 99px; border: 1px solid var(--border); }
+
+  /* ── Health strip ── */
+  .health-strip {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 8px 24px; display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  }
+  .health-label { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-right: 4px; }
+  .connector {
+    display: flex; align-items: center; gap: 5px; padding: 4px 10px;
+    border-radius: 99px; font-size: 11px; font-weight: 500; border: 1px solid transparent;
+  }
+  .connector.green { background: rgba(52,211,153,.1); border-color: rgba(52,211,153,.25); color: var(--green); }
+  .connector.amber { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.25); color: var(--amber); }
+  .connector.red   { background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.25); color: var(--red); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .dot.pulse { animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .health-spacer { flex: 1; }
+  .health-ts { font-size: 10px; color: var(--muted); }
+
+  /* ── Content ── */
+  .content { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+
+  /* ── AI Flag ── */
+  .ai-flag {
+    background: linear-gradient(135deg, rgba(251,146,60,.06), rgba(79,110,247,.06));
+    border: 1px solid rgba(251,146,60,.3); border-radius: 10px;
+    padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px;
+  }
+  .ai-flag .badge { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .ai-flag-body { flex: 1; }
+  .ai-flag-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .ai-flag-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); }
+  .ai-flag-conf { font-size: 10px; color: var(--muted); background: var(--surface2); padding: 2px 7px; border-radius: 99px; border: 1px solid var(--border); }
+  .ai-flag-text { font-size: 12.5px; color: var(--text); line-height: 1.5; }
+  .ai-flag-text cite { color: var(--muted); font-style: normal; font-size: 11px; }
+  .ai-flag-actions { display: flex; gap: 6px; margin-top: 10px; }
+  .ai-btn { padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text); transition: all .15s; }
+  .ai-btn:hover { background: var(--surface3); }
+  .ai-btn.accept { border-color: var(--green); color: var(--green); }
+  .ai-btn.accept:hover { background: rgba(52,211,153,.1); }
+  .ai-btn.dismiss { border-color: var(--border); color: var(--muted); }
+
+  /* ── KPI row ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .kpi-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; display: flex; flex-direction: column; gap: 6px;
+    transition: border-color .15s;
+  }
+  .kpi-card:hover { border-color: var(--accent); }
+  .kpi-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  .kpi-value { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .kpi-value.good { color: var(--green); }
+  .kpi-value.warn { color: var(--amber); }
+  .kpi-value.bad  { color: var(--red); }
+  .kpi-meta { display: flex; align-items: center; gap: 6px; }
+  .kpi-target { font-size: 10px; color: var(--muted); }
+  .kpi-trend { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+  .trend-up   { background: rgba(52,211,153,.12); color: var(--green); }
+  .trend-down { background: rgba(248,113,113,.12); color: var(--red); }
+  .trend-flat { background: rgba(122,130,160,.12); color: var(--muted); }
+  .kpi-bar-bg { height: 4px; background: var(--surface3); border-radius: 2px; margin-top: 4px; }
+  .kpi-bar    { height: 4px; border-radius: 2px; transition: width .4s ease; }
+
+  /* ── Revenue ticker ── */
+  .revenue-ticker {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 18px; display: flex; align-items: center; gap: 16px;
+  }
+  .ticker-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  .ticker-value { font-size: 20px; font-weight: 800; color: var(--red); letter-spacing: -.02em; }
+  .ticker-divider { width: 1px; height: 32px; background: var(--border); }
+  .ticker-stat { display: flex; flex-direction: column; gap: 2px; }
+  .ticker-stat-val { font-size: 14px; font-weight: 700; color: var(--text); }
+  .ticker-stat-lab { font-size: 10px; color: var(--muted); }
+  .ticker-spacer { flex: 1; }
+  .risk-bands { display: flex; gap: 12px; }
+  .risk-band { display: flex; align-items: center; gap: 6px; }
+  .risk-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .risk-dot.high   { background: var(--red); }
+  .risk-dot.medium { background: var(--amber); }
+  .risk-dot.low    { background: var(--green); }
+  .risk-label { font-size: 11px; color: var(--muted); }
+  .risk-count { font-size: 11px; font-weight: 700; color: var(--text); }
+
+  /* ── 2-col layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 340px; gap: 14px; }
+
+  /* ── Signals feed ── */
+  .panel {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .panel-header {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-title { font-size: 12px; font-weight: 700; flex: 1; }
+  .live-chip { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; background: rgba(248,113,113,.12); color: var(--red); border: 1px solid rgba(248,113,113,.25); padding: 2px 7px; border-radius: 99px; display: flex; align-items: center; gap: 4px; }
+  .live-chip .dot { width: 5px; height: 5px; background: var(--red); }
+  .panel-body { flex: 1; overflow-y: auto; }
+  .signal-item {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+    transition: background .12s;
+  }
+  .signal-item:hover { background: var(--surface2); }
+  .signal-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .signal-body { flex: 1; min-width: 0; }
+  .signal-main { font-size: 12px; color: var(--text); line-height: 1.4; }
+  .signal-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+  .signal-tag { font-size: 10px; color: var(--muted); background: var(--surface3); padding: 1px 6px; border-radius: 3px; }
+  .signal-time { font-size: 10px; color: var(--muted); }
+  .signal-count { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--red); }
+
+  /* ── Approval panel ── */
+  .approval-item {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background .12s;
+  }
+  .approval-item:hover { background: var(--surface2); }
+  .approval-row { display: flex; align-items: center; gap: 8px; }
+  .approval-cust { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; }
+  .approval-score { font-size: 11px; font-weight: 700; }
+  .score-high { color: var(--red); }
+  .score-med  { color: var(--amber); }
+  .approval-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .approval-tier { font-size: 10px; color: var(--muted); background: var(--surface3); padding: 1px 6px; border-radius: 3px; }
+  .sla-timer { margin-left: auto; font-size: 10px; font-weight: 600; }
+  .sla-ok { color: var(--muted); }
+  .sla-warn { color: var(--amber); }
+  .sla-breach { color: var(--red); animation: pulse 1s ease-in-out infinite; }
+  .approval-actions { display: flex; gap: 5px; margin-top: 6px; }
+  .aa-btn { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; transition: all .12s; }
+  .aa-btn.approve { border-color: var(--green); color: var(--green); }
+  .aa-btn.approve:hover { background: rgba(52,211,153,.1); }
+  .aa-btn.override { border-color: var(--amber); color: var(--amber); }
+  .aa-btn.override:hover { background: rgba(245,158,11,.1); }
+
+  /* ── Mini chart (sparkline via SVG) ── */
+  .chart-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .chart-header { display: flex; align-items: center; margin-bottom: 10px; }
+  .chart-title { font-size: 12px; font-weight: 700; flex: 1; }
+  .chart-legend { display: flex; gap: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+  .legend-line { width: 16px; height: 2px; border-radius: 1px; }
+  svg.sparkline { width: 100%; height: 80px; overflow: visible; }
+  .tooltip-card {
+    position: fixed; pointer-events: none; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; font-size: 11px; color: var(--text);
+    z-index: 9999; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  }
+
+  /* ── Chatbot FAB ── */
+  .fab {
+    position: fixed; bottom: 24px; right: 24px; width: 52px; height: 52px;
+    border-radius: 50%; background: var(--accent); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+    box-shadow: 0 4px 20px rgba(79,110,247,.4); transition: all .2s; z-index: 100;
+  }
+  .fab:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(79,110,247,.5); }
+
+  /* ── Chat panel ── */
+  .chat-panel {
+    position: fixed; bottom: 90px; right: 24px; width: 360px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.6); z-index: 99; display: none;
+    flex-direction: column; overflow: hidden; height: 460px;
+  }
+  .chat-panel.open { display: flex; }
+  .chat-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .chat-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,var(--accent),var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .chat-title { font-size: 13px; font-weight: 700; flex: 1; }
+  .chat-close { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; line-height: 1; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .msg { max-width: 85%; }
+  .msg-bot { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+  .msg-bubble { padding: 9px 12px; border-radius: 10px; font-size: 12px; line-height: 1.5; }
+  .msg-bot .msg-bubble { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+  .msg-user .msg-bubble { background: var(--accent); color: #fff; }
+  .chat-input-row { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+  .chat-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-size: 12px; font-family: var(--font); resize: none; }
+  .chat-input:focus { outline: none; border-color: var(--accent); }
+  .chat-send { background: var(--accent); border: none; border-radius: 8px; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; transition: opacity .15s; }
+  .chat-send:hover { opacity: .85; }
+  .quick-chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 8px; }
+  .chip { padding: 4px 10px; border-radius: 99px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 10px; cursor: pointer; transition: all .12s; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; top: 20px; right: 24px; background: var(--surface2); border: 1px solid var(--green);
+    color: var(--green); padding: 10px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    z-index: 999; display: none; animation: slideIn .2s ease;
+  }
+  @keyframes slideIn { from { transform: translateY(-10px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+  .toast.show { display: block; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">Apex<br><span>Retention Intelligence Platform</span></div>
+  <nav class="nav">
+    <div class="nav-section">Operate</div>
+    <div class="nav-item active" onclick="setActive(this)"><span class="icon">⬡</span> Command Center</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="icon">⚠</span> At-Risk Queue <span class="nav-badge">47</span></div>
+    <div class="nav-item" onclick="setActive(this)"><span class="icon">◎</span> Customer 360</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="icon">◈</span> Retention Brief</div>
+    <div class="nav-section">Execute</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="icon">✉</span> Campaign & Outreach</div>
+    <div class="nav-section">Analyse</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="icon">◫</span> Impact & ROI</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="icon">⬡</span> Token & Cost Analytics</div>
+    <div class="nav-section">Configure</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="icon">⚙</span> Admin & Governance</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">SA</div>
+      <div class="user-info">
+        <div class="user-name">Sarah A.</div>
+        <div class="user-role">CRM Analyst</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title">Command Center <span class="topbar-sub">Live dashboard · all segments</span></div>
+    <div class="topbar-actions">
+      <div class="time-chip" id="clock">—</div>
+      <button class="btn" onclick="simulateSignal()">↻ Refresh signals</button>
+      <button class="btn btn-primary">+ Run segment</button>
+    </div>
+  </div>
+
+  <!-- Health strip -->
+  <div class="health-strip">
+    <span class="health-label">Connectors</span>
+    <div class="connector green"><div class="dot pulse"></div>Salesforce</div>
+    <div class="connector green"><div class="dot pulse"></div>Shopify</div>
+    <div class="connector green"><div class="dot pulse"></div>Yotpo</div>
+    <div class="connector amber"><div class="dot"></div>Klaviyo <span style="font-size:9px;margin-left:2px;">15m lag</span></div>
+    <div class="connector green"><div class="dot pulse"></div>Zendesk</div>
+    <div class="connector red" id="ga-connector"><div class="dot pulse"></div>Google Analytics</div>
+    <div class="health-spacer"></div>
+    <div class="health-ts">Last sync: <strong>just now</strong> &nbsp;·&nbsp; 5/6 healthy</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- AI Recommendation Flag -->
+    <div class="ai-flag">
+      <div class="badge">🟠</div>
+      <div class="ai-flag-body">
+        <div class="ai-flag-header">
+          <span class="ai-flag-label">AI Recommendation · Command Center</span>
+          <span class="ai-flag-conf">Confidence 88</span>
+        </div>
+        <div class="ai-flag-text">
+          Churn-risk spike in Loyalty Tier 2 — <strong>340 new HIGH customers</strong> detected in the last 24h.
+          Session collapse pattern matches prior churn cohort.
+          <cite>[GA, Yotpo]</cite>
+        </div>
+        <div class="ai-flag-actions">
+          <button class="ai-btn accept" onclick="acceptFlag()">✓ Go to At-Risk Queue</button>
+          <button class="ai-btn" onclick="showToast('Brief generation queued for Tier 2 segment.')">⬡ Generate briefs</button>
+          <button class="ai-btn dismiss" onclick="this.closest('.ai-flag').style.display='none'">✕ Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">Annual Churn Rate</div>
+        <div class="kpi-value bad">21.4%</div>
+        <div class="kpi-meta">
+          <span class="kpi-target">Target &lt;14%</span>
+          <span class="kpi-trend trend-down">↓ 6.6pts vs 28%</span>
+        </div>
+        <div class="kpi-bar-bg"><div class="kpi-bar" style="width:53%;background:var(--red)"></div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Redemption Rate</div>
+        <div class="kpi-value warn">18.3%</div>
+        <div class="kpi-meta">
+          <span class="kpi-target">Target &gt;35%</span>
+          <span class="kpi-trend trend-up">↑ 18.3pts vs 0%</span>
+        </div>
+        <div class="kpi-bar-bg"><div class="kpi-bar" style="width:52%;background:var(--amber)"></div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Avg Campaign Launch</div>
+        <div class="kpi-value good">&lt;2 min</div>
+        <div class="kpi-meta">
+          <span class="kpi-target">Target &lt;2 min</span>
+          <span class="kpi-trend trend-up">✓ Target met</span>
+        </div>
+        <div class="kpi-bar-bg"><div class="kpi-bar" style="width:100%;background:var(--green)"></div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Offer Personalisation</div>
+        <div class="kpi-value good">79%</div>
+        <div class="kpi-meta">
+          <span class="kpi-target">Target &gt;85%</span>
+          <span class="kpi-trend trend-up">↑ 71pts vs 8%</span>
+        </div>
+        <div class="kpi-bar-bg"><div class="kpi-bar" style="width:93%;background:var(--accent2)"></div></div>
+      </div>
+    </div>
+
+    <!-- Revenue Ticker -->
+    <div class="revenue-ticker">
+      <div>
+        <div class="ticker-label">Revenue at Risk</div>
+        <div class="ticker-value" id="rar-value">$9.2M</div>
+      </div>
+      <div class="ticker-divider"></div>
+      <div class="ticker-stat">
+        <div class="ticker-stat-val">2,847</div>
+        <div class="ticker-stat-lab">High-risk customers</div>
+      </div>
+      <div class="ticker-divider"></div>
+      <div class="ticker-stat">
+        <div class="ticker-stat-val">$14.2M</div>
+        <div class="ticker-stat-lab">Total ARR baseline</div>
+      </div>
+      <div class="ticker-divider"></div>
+      <div class="ticker-stat">
+        <div class="ticker-stat-val" style="color:var(--green)">$5.0M</div>
+        <div class="ticker-stat-lab">Secured (interventions)</div>
+      </div>
+      <div class="ticker-spacer"></div>
+      <div class="risk-bands">
+        <div class="risk-band"><div class="risk-dot high"></div><span class="risk-label">HIGH</span>&nbsp;<span class="risk-count">2,847</span></div>
+        <div class="risk-band"><div class="risk-dot medium"></div><span class="risk-label">MED</span>&nbsp;<span class="risk-count">11,430</span></div>
+        <div class="risk-band"><div class="risk-dot low"></div><span class="risk-label">LOW</span>&nbsp;<span class="risk-count">186,723</span></div>
+      </div>
+    </div>
+
+    <!-- 2-col -->
+    <div class="two-col">
+
+      <!-- Signals feed -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Signals Firing Now</div>
+          <div class="live-chip"><div class="dot pulse"></div>LIVE</div>
+        </div>
+        <div class="panel-body" id="signals-feed">
+          <div class="signal-item">
+            <div class="signal-icon">📉</div>
+            <div class="signal-body">
+              <div class="signal-main">GA session collapse triggered on <strong>1,204 customers</strong> — sessions −60% in 30d</div>
+              <div class="signal-meta">
+                <span class="signal-tag">GA</span><span class="signal-tag">Behavioural</span>
+                <span class="signal-time">2 min ago</span>
+                <span class="signal-count">1,204 ↑</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item">
+            <div class="signal-icon">💔</div>
+            <div class="signal-body">
+              <div class="signal-main"><strong>340 Tier 2 members</strong> hit zero-redemption at 8-week threshold</div>
+              <div class="signal-meta">
+                <span class="signal-tag">Yotpo</span><span class="signal-tag">Loyalty</span>
+                <span class="signal-time">14 min ago</span>
+                <span class="signal-count">340 ↑</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item">
+            <div class="signal-icon">🎫</div>
+            <div class="signal-body">
+              <div class="signal-main"><strong>87 open tickets</strong> breached 5-day unresolved threshold — churn precursor detected</div>
+              <div class="signal-meta">
+                <span class="signal-tag">Zendesk</span><span class="signal-tag">Support</span>
+                <span class="signal-time">31 min ago</span>
+                <span class="signal-count">87</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item">
+            <div class="signal-icon">🛒</div>
+            <div class="signal-body">
+              <div class="signal-main">AOV decline &gt;30% in 90d on <strong>423 accounts</strong> — discount dependency pattern</div>
+              <div class="signal-meta">
+                <span class="signal-tag">Shopify</span><span class="signal-tag">Transactional</span>
+                <span class="signal-time">1h ago</span>
+                <span class="signal-count">423</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item">
+            <div class="signal-icon">✉</div>
+            <div class="signal-body">
+              <div class="signal-main">Email engagement collapse — <strong>612 customers</strong> at &lt;5% open rate (down from &gt;25%)</div>
+              <div class="signal-meta">
+                <span class="signal-tag">Klaviyo</span><span class="signal-tag">Engagement</span>
+                <span class="signal-time">2h ago</span>
+                <span class="signal-count">612</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item" id="new-signal" style="display:none;background:rgba(79,110,247,.06);border-left:3px solid var(--accent)">
+            <div class="signal-icon">⚡</div>
+            <div class="signal-body">
+              <div class="signal-main"><strong>NEW — 178 Tier 1 members</strong> showing composite score jump to HIGH in real time</div>
+              <div class="signal-meta">
+                <span class="signal-tag">Composite</span><span class="signal-tag">Multi-signal</span>
+                <span class="signal-time">just now</span>
+                <span class="signal-count" style="color:var(--accent)">178 ↑↑</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right col -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Pending approvals -->
+        <div class="panel" style="flex:1">
+          <div class="panel-header">
+            <div class="panel-title">Pending Approval</div>
+            <span style="font-size:11px;font-weight:700;color:var(--amber);">7 awaiting</span>
+          </div>
+          <div class="panel-body">
+            <div class="approval-item">
+              <div class="approval-row">
+                <div class="approval-cust">Eleanor Voss #4471</div>
+                <div class="approval-score score-high">91 HIGH</div>
+              </div>
+              <div class="approval-meta">
+                <span class="approval-tier">Tier 2 · $2,840 LTV</span>
+                <span class="sla-timer sla-breach" id="sla-4471">SLA: 0m 47s</span>
+              </div>
+              <div class="approval-actions">
+                <button class="aa-btn approve" onclick="approveItem(this, '4471')">✓ Approve</button>
+                <button class="aa-btn override" onclick="showToast('Override logged — reason required.')">⟳ Override</button>
+              </div>
+            </div>
+            <div class="approval-item">
+              <div class="approval-row">
+                <div class="approval-cust">Marcus Chen #7823</div>
+                <div class="approval-score score-high">88 HIGH</div>
+              </div>
+              <div class="approval-meta">
+                <span class="approval-tier">Tier 1 · $5,120 LTV</span>
+                <span class="sla-timer sla-warn">SLA: 4m 12s</span>
+              </div>
+              <div class="approval-actions">
+                <button class="aa-btn approve" onclick="approveItem(this, '7823')">✓ Approve</button>
+                <button class="aa-btn override" onclick="showToast('Override logged — reason required.')">⟳ Override</button>
+              </div>
+            </div>
+            <div class="approval-item">
+              <div class="approval-row">
+                <div class="approval-cust">Priya Nair #3301</div>
+                <div class="approval-score score-med">72 MED</div>
+              </div>
+              <div class="approval-meta">
+                <span class="approval-tier">Tier 3 · $940 LTV</span>
+                <span class="sla-timer sla-ok">SLA: 9m 55s</span>
+              </div>
+              <div class="approval-actions">
+                <button class="aa-btn approve" onclick="approveItem(this, '3301')">✓ Approve</button>
+                <button class="aa-btn override" onclick="showToast('Override logged — reason required.')">⟳ Override</button>
+              </div>
+            </div>
+            <div style="padding:8px 16px;font-size:10px;color:var(--muted);">+ 4 more awaiting · <span style="color:var(--accent);cursor:pointer">View all</span></div>
+          </div>
+        </div>
+
+        <!-- Churn trend mini-chart -->
+        <div class="chart-panel">
+          <div class="chart-header">
+            <div class="chart-title">Churn Rate — 90d Trend</div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-line" style="background:var(--red)"></div>Actual</div>
+              <div class="legend-item"><div class="legend-line" style="background:var(--muted);border-top:1px dashed var(--muted)"></div>Target</div>
+            </div>
+          </div>
+          <svg class="sparkline" viewBox="0 0 300 80" preserveAspectRatio="none">
+            <!-- target line -->
+            <line x1="0" y1="58" x2="300" y2="58" stroke="#7a82a0" stroke-width="1" stroke-dasharray="4,3" />
+            <text x="304" y="62" font-size="9" fill="#7a82a0">14%</text>
+            <!-- actual path: starts high (28%), trends down to 21.4% -->
+            <polyline points="0,4 30,6 60,10 90,16 120,22 150,28 180,32 210,36 240,40 270,42 300,44"
+              fill="none" stroke="#f87171" stroke-width="2" stroke-linejoin="round" />
+            <polyline points="0,4 30,6 60,10 90,16 120,22 150,28 180,32 210,36 240,40 270,42 300,44"
+              fill="url(#redGrad)" opacity=".2" />
+            <defs>
+              <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#f87171"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </linearGradient>
+            </defs>
+            <!-- data points -->
+            <circle cx="0" cy="4" r="3" fill="#f87171"/>
+            <circle cx="300" cy="44" r="3" fill="#f87171"/>
+            <text x="0" y="0" font-size="8" fill="#f87171" dy="-3">28%</text>
+            <text x="262" y="40" font-size="8" fill="#f87171">21.4%</text>
+            <!-- axis labels -->
+            <text x="0"   y="78" font-size="8" fill="#7a82a0">90d ago</text>
+            <text x="258" y="78" font-size="8" fill="#7a82a0">Today</text>
+          </svg>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Chatbot FAB -->
+<button class="fab" onclick="toggleChat()" title="AI Assistant">💬</button>
+
+<!-- Chat panel -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <div class="chat-avatar">⬡</div>
+    <div class="chat-title">Apex AI Assistant</div>
+    <button class="chat-close" onclick="toggleChat()">×</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="msg msg-bot">
+      <div class="msg-bubble">Hi Sarah. You're on the Command Center. I can see 7 approvals pending and a Tier 2 churn spike.<br><br>What would you like to know?</div>
+    </div>
+  </div>
+  <div class="quick-chips" id="quick-chips">
+    <div class="chip" onclick="sendChip(this)">Top 10 at-risk today</div>
+    <div class="chip" onclick="sendChip(this)">Why is #4471 HIGH?</div>
+    <div class="chip" onclick="sendChip(this)">Oldest pending approval?</div>
+    <div class="chip" onclick="sendChip(this)">AI cost this week?</div>
+  </div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-input" rows="1" placeholder="Ask anything about retention..." onkeydown="handleKey(event)"></textarea>
+    <button class="chat-send" onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' }) + ' IST';
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// SLA countdown
+let slaSeconds = 47;
+setInterval(() => {
+  if (slaSeconds > 0) slaSeconds--;
+  const el = document.getElementById('sla-4471');
+  if (el) {
+    const m = Math.floor(slaSeconds / 60), s = slaSeconds % 60;
+    el.textContent = `SLA: ${m}m ${String(s).padStart(2,'0')}s`;
+    if (slaSeconds === 0) el.textContent = 'SLA BREACHED';
+  }
+}, 1000);
+
+// Nav active state
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Simulate new signal
+function simulateSignal() {
+  document.getElementById('new-signal').style.display = 'flex';
+  showToast('178 new composite HIGH signals detected — Tier 1');
+}
+
+// Approve item
+function approveItem(btn, id) {
+  const item = btn.closest('.approval-item');
+  item.style.opacity = '0.4';
+  item.style.pointerEvents = 'none';
+  showToast(`Brief #${id} approved — campaign queued for send.`);
+}
+
+// Accept AI flag
+function acceptFlag() {
+  showToast('Navigating to At-Risk Queue → Tier 2 HIGH segment...');
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Chat
+function toggleChat() {
+  document.getElementById('chat-panel').classList.toggle('open');
+}
+
+const chatResponses = {
+  'top 10 at-risk today': 'Here are today\'s top 10 by risk × value:\n1. Eleanor Voss #4471 — Score 91, $2,840 LTV\n2. Marcus Chen #7823 — Score 88, $5,120 LTV\n3. Anika Rao #9102 — Score 85, $3,910 LTV\n…and 7 more. Opening the At-Risk Queue filtered view?',
+  'why is #4471 high?': 'Customer #4471 (Eleanor Voss) scores 91/HIGH due to 3 co-occurring signals:\n• Sessions −60% [GA] → sub-score 88\n• 0 redemptions in 8 weeks [Yotpo] → sub-score 95\n• Unresolved ticket, 6 days [Zendesk] → sub-score 74\nInteraction boost applied: all 3 signals co-occurring → score lifted into HIGH band. [Model v2.1]',
+  'oldest pending approval?': 'Oldest: Eleanor Voss #4471 — SLA breaching now (was queued 2h 47m ago). DRI review was routed due to $2,840 LTV above the auto-approve threshold ($500). Recommend approving now.',
+  'ai cost this week?': 'This week (last 7 days):\n• Total tokens: 9,287,518\n• Total cost: $30.83\n• Cost per brief: $0.63\n• Cost per intervention fired: $1.24\nParser Agent is the main cost driver (76%). Want the full Area 8 breakdown?',
+};
+
+function sendChip(chip) {
+  const text = chip.textContent;
+  chip.closest('.quick-chips').style.display = 'none';
+  addMessage(text, 'user');
+  setTimeout(() => {
+    const key = text.toLowerCase();
+    const resp = chatResponses[key] || 'I\'m pulling that data now... Here\'s what I found across the 6 connected systems. Want me to generate a brief or take any action?';
+    addMessage(resp, 'bot');
+  }, 600);
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addMessage(text, 'user');
+  setTimeout(() => {
+    addMessage('Got it. Checking across Salesforce, Shopify, Yotpo, Klaviyo, Zendesk, and GA now… I\'ll surface the most relevant data for your query. Everything I show is cited to a source system and logged to the audit trail.', 'bot');
+  }, 700);
+}
+
+function addMessage(text, type) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg msg-${type}`;
+  div.innerHTML = `<div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apex Retail — Multi-Agent Architecture Visualization</title>
+<style>
+:root{
+  --bg:#060b14;--s:#0d1526;--s2:#111c30;--s3:#162038;
+  --bd:#1e2d4a;--bd2:#253550;
+  --tx:#e8edf8;--mu:#7080a0;--mu2:#5060808;
+  --blue:#4d8ef5;--teal:#26c99e;--amb:#f5a623;--red:#f05060;
+  --pur:#a855f7;--cyan:#22d3ee;--grn:#34d399;
+  --grad1:linear-gradient(135deg,#1e3a5f,#0f1e35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(6,11,20,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);padding:.6rem 2rem;display:flex;align-items:center;gap:1rem}
+.nav-brand{font-weight:800;font-size:.95rem;letter-spacing:-.01em}
+.nav-sub{font-size:.72rem;color:var(--mu);margin-left:.25rem}
+.nav-links{margin-left:auto;display:flex;gap:.25rem}
+.nav-links a{padding:.25rem .65rem;border-radius:5px;color:var(--mu);font-size:.75rem;text-decoration:none;transition:.15s}
+.nav-links a:hover{color:var(--tx);background:var(--s2)}
+
+/* SECTIONS */
+section{padding:4rem 2rem;max-width:1280px;margin:0 auto}
+.sec-label{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:.5rem}
+h2{font-size:1.75rem;font-weight:800;margin-bottom:.5rem;letter-spacing:-.02em}
+h3{font-size:1.1rem;font-weight:700;margin-bottom:.75rem}
+.sub{color:var(--mu);font-size:.88rem;max-width:600px;margin-bottom:2.5rem;line-height:1.65}
+.divider{border:none;border-top:1px solid var(--bd);margin:0}
+
+/* HERO */
+#hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;padding:5rem 2rem;max-width:1280px;margin:0 auto}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;background:rgba(77,142,245,.1);border:1px solid rgba(77,142,245,.3);border-radius:20px;padding:.3rem .9rem;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:1.5rem}
+.hero-h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem}
+.hero-h1 em{font-style:normal;background:linear-gradient(90deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1.05rem;color:var(--mu);max-width:620px;line-height:1.7;margin-bottom:2.5rem}
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-top:1rem}
+.kpi{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.red::before{background:var(--red)}
+.kpi.blue::before{background:var(--blue)}
+.kpi.teal::before{background:var(--teal)}
+.kpi.amb::before{background:var(--amb)}
+.kpi.pur::before{background:var(--pur)}
+.kpi-v{font-size:1.9rem;font-weight:900;line-height:1;letter-spacing:-.03em}
+.kpi-delta{font-size:.72rem;font-weight:700;padding:.12rem .4rem;border-radius:4px;display:inline-block;margin-top:.2rem}
+.dn{background:rgba(240,80,96,.15);color:var(--red)}
+.up{background:rgba(38,201,158,.15);color:var(--teal)}
+.kpi-l{font-size:.68rem;color:var(--mu);margin-top:.35rem;text-transform:uppercase;letter-spacing:.06em}
+
+/* TABS */
+.tabs{display:flex;gap:.25rem;flex-wrap:wrap;margin-bottom:2rem;border-bottom:1px solid var(--bd);padding-bottom:0}
+.tab{padding:.55rem 1.1rem;border-radius:6px 6px 0 0;border:1px solid transparent;border-bottom:none;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--mu);background:transparent;margin-bottom:-1px;transition:.15s;position:relative}
+.tab:hover{color:var(--tx)}
+.tab.on{color:var(--tx);background:var(--s2);border-color:var(--bd);border-bottom-color:var(--s2)}
+.tab-panel{display:none}.tab-panel.on{display:block}
+
+/* ARCH SVG */
+.arch-wrap{background:var(--s);border:1px solid var(--bd);border-radius:14px;padding:2rem;overflow-x:auto;position:relative}
+svg.arch{width:100%;min-width:900px;font-family:inherit}
+
+/* CARDS */
+.card-grid{display:grid;gap:1rem}
+.cg2{grid-template-columns:1fr 1fr}
+.cg3{grid-template-columns:repeat(3,1fr)}
+.cg4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.cg2,.cg3,.cg4{grid-template-columns:1fr}}
+.card{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:1.25rem}
+.card-head{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.85rem}
+.card-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.card-title{font-weight:700;font-size:.88rem}
+.card-sub{font-size:.75rem;color:var(--mu);margin-top:.15rem}
+.card p{font-size:.8rem;color:var(--mu);line-height:1.6}
+.pill{display:inline-block;padding:.1rem .45rem;border-radius:4px;font-size:.68rem;font-weight:700;margin:.1rem .05rem}
+.p-blue{background:rgba(77,142,245,.12);color:var(--blue)}
+.p-teal{background:rgba(38,201,158,.12);color:var(--teal)}
+.p-amb{background:rgba(245,166,35,.12);color:var(--amb)}
+.p-red{background:rgba(240,80,96,.12);color:var(--red)}
+.p-pur{background:rgba(168,85,247,.12);color:var(--pur)}
+.p-cyan{background:rgba(34,211,238,.12);color:var(--cyan)}
+
+/* FLOW */
+.flow-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.4rem 0}
+.fbox{background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:.4rem .75rem;font-size:.78rem;font-weight:600;white-space:nowrap}
+.farrow{color:var(--mu);font-size:1rem}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{text-align:left;padding:.55rem .9rem;background:var(--s2);color:var(--mu);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--bd)}
+td{padding:.6rem .9rem;border-bottom:1px solid var(--bd);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+
+/* SIGNAL BARS */
+.sig-bar-wrap{display:flex;align-items:center;gap:.6rem;margin:.3rem 0}
+.sig-label{font-size:.72rem;color:var(--mu);width:160px;flex-shrink:0}
+.sig-bar-bg{flex:1;height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.sig-bar-fill{height:100%;border-radius:4px;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.sig-weight{font-size:.72rem;font-weight:700;width:36px;text-align:right}
+.sig-score{font-size:.72rem;color:var(--mu);width:55px;text-align:right}
+
+/* COST VISUAL */
+.cost-compare{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.25rem}
+.cost-col{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:1.25rem}
+.cost-model{font-weight:800;font-size:1rem;margin-bottom:.35rem}
+.cost-price{font-size:.78rem;color:var(--mu);margin-bottom:.85rem}
+.call-list{display:flex;flex-direction:column;gap:.35rem}
+.call-item{display:flex;align-items:center;gap:.5rem;padding:.35rem .6rem;border-radius:6px;font-size:.78rem}
+.call-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0}
+.savings-bar{margin-top:1.5rem;background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:1.25rem}
+.sbar-label{font-size:.75rem;color:var(--mu);margin-bottom:.5rem}
+.sbar-track{height:16px;background:var(--s2);border-radius:8px;overflow:hidden;margin:.5rem 0;display:flex}
+.sbar-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff}
+
+/* SEQUENCE */
+.seq-wrap{overflow-x:auto}
+.seq{display:grid;min-width:900px}
+.seq-row{display:flex;gap:0;border-bottom:1px solid var(--bd);min-height:48px;align-items:center}
+.seq-actor{width:120px;flex-shrink:0;font-size:.7rem;font-weight:700;color:var(--mu);padding:.5rem .75rem;text-align:center;border-right:1px solid var(--bd)}
+.seq-line{flex:1;position:relative;padding:.4rem .5rem}
+.seq-msg{display:inline-flex;align-items:center;gap:.4rem;background:var(--s2);border:1px solid var(--bd);border-radius:5px;padding:.3rem .65rem;font-size:.73rem;white-space:nowrap}
+.seq-header{background:var(--s2);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mu)}
+
+/* MCP */
+.mcp-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:1.5rem;align-items:center;margin-top:1.5rem}
+.mcp-server{background:var(--s);border:2px solid var(--pur);border-radius:12px;padding:1.5rem;text-align:center}
+.mcp-consumers{display:flex;flex-direction:column;gap:.75rem}
+.mcp-source-systems{display:flex;flex-direction:column;gap:.75rem}
+.mcp-consumer{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;gap:.65rem;font-size:.8rem;font-weight:600}
+.mcp-arrow{text-align:center;color:var(--pur);font-size:1.2rem}
+
+/* BEFORE/AFTER */
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.ba-col{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:1.25rem}
+.ba-col.after{border-color:rgba(38,201,158,.4)}
+.ba-header{font-weight:800;font-size:.9rem;padding:.35rem .7rem;border-radius:6px;display:inline-block;margin-bottom:1rem}
+.ba-before .ba-header{background:rgba(240,80,96,.1);color:var(--red)}
+.ba-after .ba-header{background:rgba(38,201,158,.1);color:var(--teal)}
+.ba-row{display:flex;justify-content:space-between;align-items:baseline;padding:.45rem 0;border-bottom:1px solid var(--bd);font-size:.8rem}
+.ba-row:last-child{border-bottom:none}
+.ba-metric{color:var(--mu)}
+.ba-val{font-weight:700}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:.5rem;bottom:.5rem;width:2px;background:linear-gradient(to bottom,var(--blue),var(--teal))}
+.tl-item{position:relative;margin-bottom:1.5rem}
+.tl-dot{position:absolute;left:-1.75rem;top:.2rem;width:14px;height:14px;border-radius:50%;border:2px solid var(--blue);background:var(--bg)}
+.tl-item.done .tl-dot{background:var(--blue)}
+.tl-label{font-size:.72rem;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem}
+.tl-title{font-weight:700;font-size:.9rem;margin-bottom:.3rem}
+.tl-body{font-size:.78rem;color:var(--mu);line-height:1.6}
+
+/* GRADIENT TEXT */
+.gt-blue{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.gt-teal{background:linear-gradient(90deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* ANIMATE */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease both}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s ease infinite}
+
+/* FOOTBAR */
+footer{background:var(--s);border-top:1px solid var(--bd);padding:1.5rem 2rem;text-align:center;font-size:.75rem;color:var(--mu)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div>
+    <span class="nav-brand">Apex Retail</span>
+    <span class="nav-sub">Multi-Agent Retention Architecture</span>
+  </div>
+  <div class="nav-links">
+    <a href="#hero">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#agents">Agents</a>
+    <a href="#scoring">Scoring</a>
+    <a href="#cost">Cost Model</a>
+    <a href="#mcp">MCP</a>
+    <a href="#flow">Flow</a>
+    <a href="#impact">Impact</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ HERO -->
+<section id="hero">
+  <div class="hero-tag">AI Retention System · Amazon Bedrock · 4-Agent Architecture</div>
+  <h1 class="hero-h1">From <em>4-day lag</em><br>to 47-second response</h1>
+  <p class="hero-sub">
+    Apex Retail's $14.2M churn problem solved by a 4-agent AI system that reads all 6 siloed platforms in parallel, computes a composite churn score, and surfaces a personalized retention brief — ready for one-click approval.
+  </p>
+  <div class="kpi-strip">
+    <div class="kpi red">
+      <div class="kpi-v" style="color:var(--red)">28%<span style="font-size:.9rem">→14%</span></div>
+      <div class="kpi-delta dn">−50%</div>
+      <div class="kpi-l">Annual Churn Rate</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-v" style="color:var(--blue)">47s</div>
+      <div class="kpi-delta up">from 4.2 days</div>
+      <div class="kpi-l">Campaign Launch Time</div>
+    </div>
+    <div class="kpi teal">
+      <div class="kpi-v" style="color:var(--teal)">38%</div>
+      <div class="kpi-delta up">from 0%</div>
+      <div class="kpi-l">Loyalty Redemption</div>
+    </div>
+    <div class="kpi amb">
+      <div class="kpi-v" style="color:var(--amb)">87%</div>
+      <div class="kpi-delta up">from 8%</div>
+      <div class="kpi-l">Offer Personalisation</div>
+    </div>
+    <div class="kpi pur">
+      <div class="kpi-v" style="color:var(--pur)">$4.2M</div>
+      <div class="kpi-delta up">annualised</div>
+      <div class="kpi-l">Revenue Protected</div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════ ARCHITECTURE -->
+<section id="architecture">
+  <div class="sec-label">System Architecture</div>
+  <h2>Five-Layer Multi-Agent System</h2>
+  <p class="sub">Signal triggers → algorithmic scoring → AI orchestrator fans out to 4 specialized agents → human approval gate. No campaign fires without CRM manager sign-off.</p>
+
+  <div class="tabs" id="arch-tabs">
+    <button class="tab on" onclick="switchTab('arch','overview')">System Overview</button>
+    <button class="tab" onclick="switchTab('arch','dataflow')">Data Flow</button>
+    <button class="tab" onclick="switchTab('arch','sequence')">Agent Sequence</button>
+    <button class="tab" onclick="switchTab('arch','stack')">Tech Stack</button>
+  </div>
+
+  <!-- OVERVIEW TAB -->
+  <div class="tab-panel on" id="arch-overview">
+    <div class="arch-wrap">
+      <svg class="arch" viewBox="0 0 1000 680" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4d8ef5" opacity=".7"/>
+          </marker>
+          <marker id="arr-teal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#26c99e" opacity=".7"/>
+          </marker>
+          <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#f05060" opacity=".7"/>
+          </marker>
+          <marker id="arr-pur" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#a855f7" opacity=".7"/>
+          </marker>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- LAYER 1: TRIGGERS -->
+        <rect x="10" y="10" width="980" height="70" rx="8" fill="#0d1a30" stroke="#1e3a5f" stroke-width="1.5"/>
+        <text x="25" y="32" fill="#4d8ef5" font-size="9" font-weight="700" letter-spacing="2" text-anchor="start" font-family="sans-serif">LAYER 1 — SIGNAL TRIGGERS</text>
+        <!-- trigger boxes -->
+        <rect x="20" y="38" width="140" height="32" rx="5" fill="#1e3a5f" stroke="#4d8ef5" stroke-width="1"/>
+        <text x="90" y="55" fill="#e8edf8" font-size="9" text-anchor="middle" font-family="sans-serif">GA: Sessions −40%</text>
+        <rect x="170" y="38" width="140" height="32" rx="5" fill="#1e3a5f" stroke="#4d8ef5" stroke-width="1"/>
+        <text x="240" y="55" fill="#e8edf8" font-size="9" text-anchor="middle" font-family="sans-serif">Shopify: AOV −25%</text>
+        <rect x="320" y="38" width="150" height="32" rx="5" fill="#1e3a5f" stroke="#4d8ef5" stroke-width="1"/>
+        <text x="395" y="55" fill="#e8edf8" font-size="9" text-anchor="middle" font-family="sans-serif">Yotpo: 0 redemptions @4w</text>
+        <rect x="480" y="38" width="140" height="32" rx="5" fill="#1e3a5f" stroke="#4d8ef5" stroke-width="1"/>
+        <text x="550" y="55" fill="#e8edf8" font-size="9" text-anchor="middle" font-family="sans-serif">Klaviyo: Open &lt;10%</text>
+        <rect x="630" y="38" width="155" height="32" rx="5" fill="#1e3a5f" stroke="#4d8ef5" stroke-width="1"/>
+        <text x="707" y="55" fill="#e8edf8" font-size="9" text-anchor="middle" font-family="sans-serif">Zendesk: Unresolved &gt;5d</text>
+        <rect x="795" y="38" width="155" height="32" rx="5" fill="#1e3a5f" stroke="#4d8ef5" stroke-width="1"/>
+        <text x="872" y="55" fill="#e8edf8" font-size="9" text-anchor="middle" font-family="sans-serif">Scheduled score recalc</text>
+
+        <!-- arrows down to scoring -->
+        <line x1="500" y1="80" x2="500" y2="108" stroke="#4d8ef5" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+
+        <!-- LAYER 2: SCORING ENGINE -->
+        <rect x="150" y="110" width="700" height="80" rx="8" fill="#101e35" stroke="#253550" stroke-width="1.5"/>
+        <text x="500" y="128" fill="#7080a0" font-size="9" font-weight="700" letter-spacing="2" text-anchor="middle" font-family="sans-serif">LAYER 2 — SCORING ENGINE (ALGORITHMIC · NO LLM · FREE)</text>
+        <!-- 3 steps -->
+        <rect x="168" y="132" width="180" height="46" rx="5" fill="#1a2744" stroke="#2a3f6a" stroke-width="1"/>
+        <text x="258" y="150" fill="#4d8ef5" font-size="9" text-anchor="middle" font-weight="700" font-family="sans-serif">Signal Normalizer</text>
+        <text x="258" y="163" fill="#7080a0" font-size="8" text-anchor="middle" font-family="sans-serif">min-max per metric → 0-100</text>
+        <line x1="348" y1="155" x2="370" y2="155" stroke="#4d8ef5" stroke-width="1.5" marker-end="url(#arr)"/>
+        <rect x="372" y="132" width="195" height="46" rx="5" fill="#1a2744" stroke="#2a3f6a" stroke-width="1"/>
+        <text x="469" y="150" fill="#4d8ef5" font-size="9" text-anchor="middle" font-weight="700" font-family="sans-serif">Weighted Linear Model</text>
+        <text x="469" y="163" fill="#7080a0" font-size="8" text-anchor="middle" font-family="sans-serif">6 signals × configurable weights</text>
+        <line x1="567" y1="155" x2="590" y2="155" stroke="#4d8ef5" stroke-width="1.5" marker-end="url(#arr)"/>
+        <rect x="592" y="132" width="195" height="46" rx="5" fill="#1a2744" stroke="#2a3f6a" stroke-width="1"/>
+        <text x="689" y="150" fill="#4d8ef5" font-size="9" text-anchor="middle" font-weight="700" font-family="sans-serif">Risk Classifier</text>
+        <text x="689" y="163" fill="#7080a0" font-size="8" text-anchor="middle" font-family="sans-serif">LOW · MEDIUM · HIGH · CRITICAL</text>
+
+        <!-- Arrow from scoring to decision gate -->
+        <line x1="500" y1="190" x2="500" y2="218" stroke="#4d8ef5" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- DECISION GATE -->
+        <polygon points="500,222 540,242 500,262 460,242" fill="#162038" stroke="#f5a623" stroke-width="1.5"/>
+        <text x="500" y="246" fill="#f5a623" font-size="9" text-anchor="middle" font-weight="700" font-family="sans-serif">Score &gt; 50?</text>
+
+        <!-- No branch → Monitor -->
+        <line x1="460" y1="242" x2="320" y2="242" stroke="#f05060" stroke-width="1.5" marker-end="url(#arr-red)"/>
+        <rect x="210" y="228" width="108" height="28" rx="5" fill="#1a1215" stroke="#f05060" stroke-width="1"/>
+        <text x="264" y="246" fill="#f05060" font-size="9" text-anchor="middle" font-family="sans-serif">Monitor only</text>
+
+        <!-- Yes branch → Orchestrator -->
+        <line x1="500" y1="262" x2="500" y2="290" stroke="#26c99e" stroke-width="1.5" marker-end="url(#arr-teal)"/>
+
+        <!-- LAYER 3: ORCHESTRATOR -->
+        <rect x="350" y="292" width="300" height="52" rx="8" fill="#1a0d35" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="500" y="312" fill="#a855f7" font-size="9" text-anchor="middle" font-weight="700" letter-spacing="1" font-family="sans-serif">LAYER 3 — ORCHESTRATOR</text>
+        <text x="500" y="330" fill="#c0a0e8" font-size="8.5" text-anchor="middle" font-family="sans-serif">Fan-out · Risk-appropriate routing · Stop / Escalate logic</text>
+
+        <!-- Fan-out arrows to 4 agents -->
+        <!-- Signal Collector -->
+        <line x1="420" y1="344" x2="130" y2="400" stroke="#4d8ef5" stroke-width="1.5" stroke-dasharray="5,2" marker-end="url(#arr)"/>
+        <!-- Offer Strategist preload -->
+        <line x1="460" y1="344" x2="350" y2="400" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="5,2" marker-end="url(#arr-pur)"/>
+        <!-- Engage preload -->
+        <line x1="540" y1="344" x2="650" y2="400" stroke="#26c99e" stroke-width="1.5" stroke-dasharray="5,2" marker-end="url(#arr-teal)"/>
+
+        <!-- LAYER 4: 4 AGENTS -->
+        <!-- Signal Collector (Haiku) -->
+        <rect x="10" y="402" width="220" height="80" rx="8" fill="#0d1f1a" stroke="#26c99e" stroke-width="1.5"/>
+        <text x="120" y="420" fill="#26c99e" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">SIGNAL COLLECTOR</text>
+        <text x="120" y="432" fill="#26c99e" font-size="7.5" text-anchor="middle" font-family="sans-serif">(Claude Haiku)</text>
+        <text x="120" y="448" fill="#6ab5a5" font-size="8" text-anchor="middle" font-family="sans-serif">Queries all 6 systems</text>
+        <text x="120" y="460" fill="#6ab5a5" font-size="8" text-anchor="middle" font-family="sans-serif">Flags conflicts · Re-queries</text>
+        <text x="120" y="474" fill="#6ab5a5" font-size="8" text-anchor="middle" font-family="sans-serif">if data looks wrong</text>
+
+        <!-- Conflict Detector (Sonnet) -->
+        <rect x="245" y="402" width="220" height="80" rx="8" fill="#1f0d0d" stroke="#f05060" stroke-width="1.5"/>
+        <text x="355" y="420" fill="#f05060" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">CONFLICT DETECTOR</text>
+        <text x="355" y="432" fill="#f05060" font-size="7.5" text-anchor="middle" font-family="sans-serif">(Claude Sonnet)</text>
+        <text x="355" y="448" fill="#c08080" font-size="8" text-anchor="middle" font-family="sans-serif">CRM vs GA cross-check</text>
+        <text x="355" y="460" fill="#c08080" font-size="8" text-anchor="middle" font-family="sans-serif">Temporal gap analysis</text>
+        <text x="355" y="474" fill="#f05060" font-size="8" text-anchor="middle" font-weight="700" font-family="sans-serif">Can REJECT pipeline</text>
+
+        <!-- Offer Strategist (Sonnet) -->
+        <rect x="480" y="402" width="220" height="80" rx="8" fill="#1a0d2e" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="590" y="420" fill="#a855f7" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">OFFER STRATEGIST</text>
+        <text x="590" y="432" fill="#a855f7" font-size="7.5" text-anchor="middle" font-family="sans-serif">(Claude Sonnet)</text>
+        <text x="590" y="448" fill="#b090d0" font-size="8" text-anchor="middle" font-family="sans-serif">Tier-matched offer design</text>
+        <text x="590" y="460" fill="#b090d0" font-size="8" text-anchor="middle" font-family="sans-serif">Margin headroom check</text>
+        <text x="590" y="474" fill="#a855f7" font-size="8" text-anchor="middle" font-weight="700" font-family="sans-serif">Can ESCALATE to DRI</text>
+
+        <!-- Engagement Crafter (Haiku) -->
+        <rect x="715" y="402" width="225" height="80" rx="8" fill="#0d1a2e" stroke="#4d8ef5" stroke-width="1.5"/>
+        <text x="827" y="420" fill="#4d8ef5" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">ENGAGEMENT CRAFTER</text>
+        <text x="827" y="432" fill="#4d8ef5" font-size="7.5" text-anchor="middle" font-family="sans-serif">(Claude Haiku)</text>
+        <text x="827" y="448" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">Email / SMS / Push drafts</text>
+        <text x="827" y="460" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">Channel priority selection</text>
+        <text x="827" y="474" fill="#4d8ef5" font-size="8" text-anchor="middle" font-weight="700" font-family="sans-serif">Feedback loop → Strategist</text>
+
+        <!-- Inter-agent arrows -->
+        <!-- Signal → Conflict -->
+        <line x1="230" y1="440" x2="245" y2="440" stroke="#26c99e" stroke-width="1.5" marker-end="url(#arr-teal)"/>
+        <!-- Conflict → Offer -->
+        <line x1="465" y1="440" x2="480" y2="440" stroke="#f05060" stroke-width="1.5" marker-end="url(#arr-red)"/>
+        <!-- Offer → Engage -->
+        <line x1="700" y1="440" x2="715" y2="440" stroke="#a855f7" stroke-width="1.5" marker-end="url(#arr-pur)"/>
+        <!-- Engage feedback to Offer -->
+        <path d="M 715 460 Q 660 510 590 480" fill="none" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+        <text x="655" y="508" fill="#4d8ef5" font-size="7.5" text-anchor="middle" font-family="sans-serif">simplify?</text>
+
+        <!-- Arrows from agents back to Orchestrator final -->
+        <line x1="355" y1="482" x2="355" y2="550" stroke="#f05060" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arr-red)"/>
+        <line x1="590" y1="482" x2="590" y2="550" stroke="#a855f7" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arr-pur)"/>
+        <line x1="827" y1="482" x2="827" y2="550" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+
+        <!-- ORCHESTRATOR FINAL ASSEMBLY -->
+        <rect x="240" y="552" width="650" height="40" rx="8" fill="#1a0d35" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="565" y="572" fill="#c0a0e8" font-size="9" text-anchor="middle" font-family="sans-serif">ORCHESTRATOR — Final Assembly: Retention Brief · Offer · 3-Channel Outreach · Audit Entry</text>
+
+        <!-- Arrow to human approval -->
+        <line x1="565" y1="592" x2="565" y2="620" stroke="#f5a623" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- LAYER 5: HUMAN APPROVAL -->
+        <rect x="350" y="622" width="430" height="46" rx="8" fill="#1a1505" stroke="#f5a623" stroke-width="1.5"/>
+        <text x="565" y="642" fill="#f5a623" font-size="9" text-anchor="middle" font-weight="700" letter-spacing="1" font-family="sans-serif">LAYER 5 — HUMAN APPROVAL GATE</text>
+        <text x="565" y="658" fill="#b09050" font-size="8.5" text-anchor="middle" font-family="sans-serif">Approve (1-click) · Override (edit) · Escalate (DRI queue)</text>
+
+        <!-- Layer labels -->
+        <text x="990" y="52" fill="#4d8ef5" font-size="8" text-anchor="end" font-weight="600" font-family="sans-serif">Layer 1</text>
+        <text x="990" y="155" fill="#4d8ef5" font-size="8" text-anchor="end" font-weight="600" font-family="sans-serif">Layer 2</text>
+        <text x="990" y="322" fill="#a855f7" font-size="8" text-anchor="end" font-weight="600" font-family="sans-serif">Layer 3</text>
+        <text x="990" y="440" fill="#7080a0" font-size="8" text-anchor="end" font-weight="600" font-family="sans-serif">Layer 4</text>
+        <text x="990" y="648" fill="#f5a623" font-size="8" text-anchor="end" font-weight="600" font-family="sans-serif">Layer 5</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- DATA FLOW TAB -->
+  <div class="tab-panel" id="arch-dataflow">
+    <div class="arch-wrap">
+      <svg class="arch" viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#4d8ef5" opacity=".8"/>
+          </marker>
+        </defs>
+        <!-- 6 source systems -->
+        <text x="10" y="20" fill="#7080a0" font-size="8" font-weight="700" letter-spacing="2" font-family="sans-serif">6 SOURCE SYSTEMS</text>
+        <rect x="10" y="30" width="110" height="44" rx="6" fill="#1a1f35" stroke="#253550" stroke-width="1"/>
+        <text x="65" y="50" fill="#4d8ef5" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Salesforce CRM</text>
+        <text x="65" y="63" fill="#7080a0" font-size="7.5" text-anchor="middle" font-family="sans-serif">engagement · health</text>
+
+        <rect x="135" y="30" width="110" height="44" rx="6" fill="#1a1f35" stroke="#253550" stroke-width="1"/>
+        <text x="190" y="50" fill="#4d8ef5" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Shopify</text>
+        <text x="190" y="63" fill="#7080a0" font-size="7.5" text-anchor="middle" font-family="sans-serif">AOV · discount · orders</text>
+
+        <rect x="260" y="30" width="110" height="44" rx="6" fill="#1a1f35" stroke="#253550" stroke-width="1"/>
+        <text x="315" y="50" fill="#4d8ef5" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Yotpo</text>
+        <text x="315" y="63" fill="#7080a0" font-size="7.5" text-anchor="middle" font-family="sans-serif">points · redemptions</text>
+
+        <rect x="385" y="30" width="110" height="44" rx="6" fill="#1a1f35" stroke="#253550" stroke-width="1"/>
+        <text x="440" y="50" fill="#4d8ef5" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Klaviyo</text>
+        <text x="440" y="63" fill="#7080a0" font-size="7.5" text-anchor="middle" font-family="sans-serif">open · sms · unsub</text>
+
+        <rect x="510" y="30" width="110" height="44" rx="6" fill="#1a1f35" stroke="#253550" stroke-width="1"/>
+        <text x="565" y="50" fill="#4d8ef5" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Zendesk</text>
+        <text x="565" y="63" fill="#7080a0" font-size="7.5" text-anchor="middle" font-family="sans-serif">tickets · sentiment</text>
+
+        <rect x="635" y="30" width="110" height="44" rx="6" fill="#1a1f35" stroke="#253550" stroke-width="1"/>
+        <text x="690" y="50" fill="#4d8ef5" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Google Analytics</text>
+        <text x="690" y="63" fill="#7080a0" font-size="7.5" text-anchor="middle" font-family="sans-serif">sessions · bounce</text>
+
+        <!-- Arrows to tools -->
+        <line x1="65" y1="74" x2="65" y2="115" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr2)"/>
+        <line x1="190" y1="74" x2="190" y2="115" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr2)"/>
+        <line x1="315" y1="74" x2="315" y2="115" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr2)"/>
+        <line x1="440" y1="74" x2="440" y2="115" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr2)"/>
+        <line x1="565" y1="74" x2="565" y2="115" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr2)"/>
+        <line x1="690" y1="74" x2="690" y2="115" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr2)"/>
+
+        <!-- Tool layer -->
+        <text x="10" y="110" fill="#7080a0" font-size="8" font-weight="700" letter-spacing="2" font-family="sans-serif">AGENT TOOLS (MCP-COMPATIBLE)</text>
+        <rect x="10" y="118" width="80" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="50" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">query_crm()</text>
+        <rect x="100" y="118" width="90" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="145" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">query_shopify()</text>
+        <rect x="200" y="118" width="85" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="242" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">query_yotpo()</text>
+        <rect x="295" y="118" width="92" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="341" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">query_klaviyo()</text>
+        <rect x="397" y="118" width="90" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="442" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">query_zendesk()</text>
+        <rect x="497" y="118" width="100" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="547" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">query_analytics()</text>
+        <rect x="607" y="118" width="95" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="654" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">compute_score()</text>
+        <rect x="712" y="118" width="75" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="749" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">get_tier()</text>
+        <rect x="797" y="118" width="95" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="844" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">get_offer_hist()</text>
+        <rect x="902" y="118" width="90" height="28" rx="4" fill="#1a2744" stroke="#2a4080" stroke-width="1"/>
+        <text x="947" y="134" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">get_ch_prefs()</text>
+
+        <!-- Agents -->
+        <text x="10" y="175" fill="#7080a0" font-size="8" font-weight="700" letter-spacing="2" font-family="sans-serif">AGENT LAYER</text>
+        <rect x="10" y="182" width="180" height="42" rx="6" fill="#0d1f1a" stroke="#26c99e" stroke-width="1.5"/>
+        <text x="100" y="200" fill="#26c99e" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Signal Collector</text>
+        <text x="100" y="215" fill="#6ab5a5" font-size="7.5" text-anchor="middle" font-family="sans-serif">Haiku · all 6 query tools</text>
+        <line x1="190" y1="203" x2="215" y2="203" stroke="#26c99e" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+        <rect x="215" y="182" width="185" height="42" rx="6" fill="#1f0d0d" stroke="#f05060" stroke-width="1.5"/>
+        <text x="307" y="200" fill="#f05060" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Conflict Detector</text>
+        <text x="307" y="215" fill="#c08080" font-size="7.5" text-anchor="middle" font-family="sans-serif">Sonnet · compute_score</text>
+        <line x1="400" y1="203" x2="425" y2="203" stroke="#f05060" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+        <rect x="425" y="182" width="185" height="42" rx="6" fill="#1a0d2e" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="517" y="200" fill="#a855f7" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Offer Strategist</text>
+        <text x="517" y="215" fill="#b090d0" font-size="7.5" text-anchor="middle" font-family="sans-serif">Sonnet · tier + offer + margin</text>
+        <line x1="610" y1="203" x2="635" y2="203" stroke="#a855f7" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+        <rect x="635" y="182" width="195" height="42" rx="6" fill="#0d1a2e" stroke="#4d8ef5" stroke-width="1.5"/>
+        <text x="732" y="200" fill="#4d8ef5" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Engagement Crafter</text>
+        <text x="732" y="215" fill="#7090c0" font-size="7.5" text-anchor="middle" font-family="sans-serif">Haiku · brand voice + prefs</text>
+        <line x1="830" y1="203" x2="855" y2="203" stroke="#4d8ef5" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+        <!-- Output package -->
+        <rect x="855" y="182" width="135" height="96" rx="6" fill="#0d1a10" stroke="#26c99e" stroke-width="1.5"/>
+        <text x="922" y="198" fill="#26c99e" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">OUTPUT PACKAGE</text>
+        <text x="922" y="212" fill="#6ab5a5" font-size="7.5" text-anchor="middle" font-family="sans-serif">Retention Brief</text>
+        <text x="922" y="225" fill="#6ab5a5" font-size="7.5" text-anchor="middle" font-family="sans-serif">Personalised Offer</text>
+        <text x="922" y="238" fill="#6ab5a5" font-size="7.5" text-anchor="middle" font-family="sans-serif">Email Draft</text>
+        <text x="922" y="251" fill="#6ab5a5" font-size="7.5" text-anchor="middle" font-family="sans-serif">SMS Draft (≤160)</text>
+        <text x="922" y="264" fill="#6ab5a5" font-size="7.5" text-anchor="middle" font-family="sans-serif">Push Notification</text>
+        <text x="922" y="277" fill="#6ab5a5" font-size="7.5" text-anchor="middle" font-family="sans-serif">Audit Entry (100%)</text>
+
+        <!-- Tool to agent lines -->
+        <line x1="50" y1="146" x2="80" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="145" y1="146" x2="100" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="242" y1="146" x2="100" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="341" y1="146" x2="100" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="442" y1="146" x2="100" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="547" y1="146" x2="100" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="654" y1="146" x2="307" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="749" y1="146" x2="517" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="844" y1="146" x2="517" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+        <line x1="947" y1="146" x2="732" y2="182" stroke="#4d8ef5" stroke-width="0.8" stroke-dasharray="3,2" opacity=".5"/>
+
+        <!-- Bedrock box -->
+        <rect x="10" y="300" width="450" height="80" rx="8" fill="#0f1a10" stroke="#26c99e" stroke-width="1" stroke-dasharray="6,3"/>
+        <text x="235" y="318" fill="#26c99e" font-size="8" font-weight="700" letter-spacing="2" text-anchor="middle" font-family="sans-serif">AMAZON BEDROCK</text>
+        <rect x="20" y="326" width="200" height="44" rx="5" fill="#1a2e1a" stroke="#26c99e" stroke-width="1"/>
+        <text x="120" y="344" fill="#26c99e" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Claude 3.5 Sonnet</text>
+        <text x="120" y="357" fill="#7080a0" font-size="7.5" text-anchor="middle" font-family="sans-serif">Conflict Detector + Offer Strategist</text>
+        <text x="120" y="368" fill="#7080a0" font-size="7" text-anchor="middle" font-family="sans-serif">$3 / $15 per M tokens</text>
+        <rect x="235" y="326" width="200" height="44" rx="5" fill="#1a2e1a" stroke="#26c99e" stroke-width="1"/>
+        <text x="335" y="344" fill="#26c99e" font-size="8.5" text-anchor="middle" font-weight="700" font-family="sans-serif">Claude 3 Haiku</text>
+        <text x="335" y="357" fill="#7080a0" font-size="7.5" text-anchor="middle" font-family="sans-serif">Signal Collector + Engagement Crafter</text>
+        <text x="335" y="368" fill="#7080a0" font-size="7" text-anchor="middle" font-family="sans-serif">$0.25 / $1.25 per M tokens</text>
+
+        <!-- React Frontend -->
+        <rect x="480" y="300" width="230" height="80" rx="8" fill="#0d1a2e" stroke="#4d8ef5" stroke-width="1" stroke-dasharray="6,3"/>
+        <text x="595" y="318" fill="#4d8ef5" font-size="8" font-weight="700" letter-spacing="2" text-anchor="middle" font-family="sans-serif">REACT FRONTEND</text>
+        <text x="595" y="334" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">React 18 + TailwindCSS + shadcn/ui</text>
+        <text x="595" y="348" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">Recharts: radar · bar · timeline</text>
+        <text x="595" y="362" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">REST API :8000</text>
+        <text x="595" y="376" fill="#7090c0" font-size="8" text-anchor="middle" font-family="sans-serif">KPI Header · Risk List · Detail Panel</text>
+
+        <!-- MCP -->
+        <rect x="730" y="300" width="250" height="80" rx="8" fill="#1a0d2e" stroke="#a855f7" stroke-width="1" stroke-dasharray="6,3"/>
+        <text x="855" y="318" fill="#a855f7" font-size="8" font-weight="700" letter-spacing="2" text-anchor="middle" font-family="sans-serif">MCP SERVER</text>
+        <text x="855" y="334" fill="#b090d0" font-size="8" text-anchor="middle" font-family="sans-serif">Python mcp SDK</text>
+        <text x="855" y="348" fill="#b090d0" font-size="8" text-anchor="middle" font-family="sans-serif">Claude Desktop · Kiro IDE · Custom Agents</text>
+        <text x="855" y="362" fill="#b090d0" font-size="8" text-anchor="middle" font-family="sans-serif">5 exposed tools</text>
+        <text x="855" y="376" fill="#b090d0" font-size="8" text-anchor="middle" font-family="sans-serif">MCP Protocol</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- SEQUENCE TAB -->
+  <div class="tab-panel" id="arch-sequence">
+    <div class="arch-wrap" style="padding:1rem">
+      <div style="font-size:.75rem;color:var(--mu);margin-bottom:1rem">End-to-end sequence · Signal → Campaign Ready = 47 seconds</div>
+      <div class="seq-wrap">
+        <div style="display:grid;grid-template-columns:130px repeat(7,1fr);min-width:900px;font-size:.72rem">
+          <div style="padding:.4rem;background:var(--s2);border:1px solid var(--bd);font-weight:700;color:var(--mu);font-size:.65rem;text-transform:uppercase;letter-spacing:.05em">Step</div>
+          <div style="padding:.4rem;background:var(--s2);border:1px solid var(--bd);font-weight:700;text-align:center;color:var(--blue);font-size:.65rem">Trigger</div>
+          <div style="padding:.4rem;background:var(--s2);border:1px solid var(--bd);font-weight:700;text-align:center;color:var(--blue);font-size:.65rem">Scoring Engine</div>
+          <div style="padding:.4rem;background:var(--s2);border:1px solid var(--bd);font-weight:700;text-align:center;color:var(--pur);font-size:.65rem">Orchestrator</div>
+          <div style="padding:.4rem;background:var(--s2);border:1px solid var(--bd);font-weight:700;text-align:center;color:var(--teal);font-size:.65rem">Signal Collector</div>
+          <div style="padding:.4rem;background:var(--s2);border:1px solid var(--bd);font-weight:700;text-align:center;color:var(--red);font-size:.65rem">Conflict Detector</div>
+          <div style="padding:.4rem;background:var(--s2);border:1px solid var(--bd);font-weight:700;text-align:center;color:var(--pur);font-size:.65rem">Offer Strategist</div>
+          <div style="padding:.4rem;background:var(--s2);border:1px solid var(--bd);font-weight:700;text-align:center;color:var(--blue);font-size:.65rem">Engagement Crafter</div>
+        </div>
+        <div id="seq-rows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STACK TAB -->
+  <div class="tab-panel" id="arch-stack">
+    <div class="card-grid cg2">
+      <div class="card">
+        <h3 style="color:var(--teal)">Backend</h3>
+        <table>
+          <tr><th>Component</th><th>Technology</th></tr>
+          <tr><td>Runtime</td><td><span class="pill p-blue">Python 3.11+</span></td></tr>
+          <tr><td>API Framework</td><td><span class="pill p-blue">FastAPI</span> async, pydantic v2</td></tr>
+          <tr><td>AI SDK</td><td><span class="pill p-teal">boto3</span> / Amazon Bedrock SDK</td></tr>
+          <tr><td>Agent pattern</td><td>Pure Python, no LangChain</td></tr>
+          <tr><td>MCP</td><td><span class="pill p-pur">mcp Python SDK</span></td></tr>
+          <tr><td>Scoring</td><td>Weighted linear (numpy)</td></tr>
+          <tr><td>Data</td><td>Mock JSON files (25 customers)</td></tr>
+          <tr><td>Audit log</td><td>JSON append-only</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--blue)">Frontend</h3>
+        <table>
+          <tr><th>Component</th><th>Technology</th></tr>
+          <tr><td>Framework</td><td><span class="pill p-blue">React 18</span></td></tr>
+          <tr><td>Styling</td><td><span class="pill p-cyan">TailwindCSS</span></td></tr>
+          <tr><td>Components</td><td><span class="pill p-amb">shadcn/ui</span></td></tr>
+          <tr><td>Charts</td><td><span class="pill p-teal">Recharts</span> (radar, bar, timeline)</td></tr>
+          <tr><td>State</td><td>React Query + Zustand</td></tr>
+          <tr><td>API client</td><td>Axios → FastAPI :8000</td></tr>
+          <tr><td>Dev server</td><td>Vite</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--pur)">AI Layer</h3>
+        <table>
+          <tr><th>Model</th><th>Used For</th><th>Cost/M</th></tr>
+          <tr><td><span class="pill p-teal">Sonnet 3.5</span></td><td>Conflict Detector, Offer Strategist</td><td>$3/$15</td></tr>
+          <tr><td><span class="pill p-blue">Haiku 3</span></td><td>Signal Collector, Engagement Crafter</td><td>$0.25/$1.25</td></tr>
+          <tr><td colspan="3" style="color:var(--mu);font-size:.75rem">Provider: Amazon Bedrock · Region: us-east-1</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--amb)">Infrastructure</h3>
+        <table>
+          <tr><th>Layer</th><th>Technology</th></tr>
+          <tr><td>Dev environment</td><td>Azure VM (Windows) via Bastion</td></tr>
+          <tr><td>Editor</td><td>VS Code + GitHub Copilot</td></tr>
+          <tr><td>AI assistant</td><td>Claude Code CLI</td></tr>
+          <tr><td>Deployment</td><td>Local run (demo) / Azure VM</td></tr>
+          <tr><td>Port</td><td>Backend :8000, Frontend :3000</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════ AGENTS -->
+<section id="agents">
+  <div class="sec-label">Agent Design</div>
+  <h2>Four Specialized Agents</h2>
+  <p class="sub">Each agent runs on the right model for its task. Agents have real autonomy — they can reject the pipeline or escalate beyond standard offers.</p>
+  <div class="card-grid cg2">
+    <div class="card" style="border-color:rgba(38,201,158,.3)">
+      <div class="card-head">
+        <div class="card-ico" style="background:rgba(38,201,158,.12);color:var(--teal)">🔍</div>
+        <div>
+          <div class="card-title">Signal Collector Agent</div>
+          <div class="card-sub"><span class="pill p-teal">Claude 3 Haiku</span> — fast, low-cost data gathering</div>
+        </div>
+      </div>
+      <p><strong>Goal:</strong> Gather all available signals for a customer across all 6 systems in the minimum number of tool calls.</p>
+      <br>
+      <p><strong>Tools:</strong> <code>query_crm</code> · <code>query_shopify</code> · <code>query_yotpo</code> · <code>query_klaviyo</code> · <code>query_zendesk</code> · <code>query_analytics</code></p>
+      <br>
+      <p><strong>Autonomy decisions:</strong><br>• Decides the query order (most-predictive first)<br>• Skips systems marked stale (&gt;6h cache)<br>• Re-queries if returned data looks anomalous<br>• Flags potential conflicts for the next agent</p>
+      <br>
+      <p><strong>Output:</strong> Structured signal object passed to Conflict Detector</p>
+    </div>
+    <div class="card" style="border-color:rgba(240,80,96,.3)">
+      <div class="card-head">
+        <div class="card-ico" style="background:rgba(240,80,96,.12);color:var(--red)">🔬</div>
+        <div>
+          <div class="card-title">Conflict Detector Agent</div>
+          <div class="card-sub"><span class="pill p-red">Claude 3.5 Sonnet</span> — complex semantic reasoning</div>
+        </div>
+      </div>
+      <p><strong>Goal:</strong> Find contradictions between systems, identify leading vs lagging indicators, and assess whether the churn signal is genuine.</p>
+      <br>
+      <p><strong>Reasons about:</strong><br>• Signal conflicts (CRM 72/100 vs GA −60%)<br>• Temporal gaps (GA leads CRM by 2-3 weeks)<br>• Action gaps (14 campaigns sent, 8.2% open, no change)<br>• Seasonal vs structural patterns</p>
+      <br>
+      <p><strong style="color:var(--red)">Can REJECT pipeline:</strong> If the agent determines "not real churn, just seasonal" — it halts the pipeline, logs to audit, and no offer is generated. This prevents false-positive campaigns.</p>
+      <br>
+      <p><strong>Output:</strong> Gap analysis + adjusted score → Offer Strategist</p>
+    </div>
+    <div class="card" style="border-color:rgba(168,85,247,.3)">
+      <div class="card-head">
+        <div class="card-ico" style="background:rgba(168,85,247,.12);color:var(--pur)">💡</div>
+        <div>
+          <div class="card-title">Offer Strategist Agent</div>
+          <div class="card-sub"><span class="pill p-pur">Claude 3.5 Sonnet</span> — judgment and matching</div>
+        </div>
+      </div>
+      <p><strong>Goal:</strong> Design the optimal retention intervention given the confirmed signals, customer tier, offer history, and margin headroom.</p>
+      <br>
+      <p><strong>Tools:</strong> <code>get_customer_tier</code> · <code>get_offer_history</code> · <code>get_offer_catalog</code> · <code>check_margin_headroom</code></p>
+      <br>
+      <p><strong>Avoids:</strong> Repeating generic offers already ignored (e.g., two prior 10% vouchers rejected).</p>
+      <br>
+      <p><strong style="color:var(--pur)">Can ESCALATE:</strong> "Standard offers won't work — needs personal DRI call." Routes to DRI queue instead of automated campaign.</p>
+      <br>
+      <p><strong>Output:</strong> Offer details + confidence % → Engagement Crafter</p>
+    </div>
+    <div class="card" style="border-color:rgba(77,142,245,.3)">
+      <div class="card-head">
+        <div class="card-ico" style="background:rgba(77,142,245,.12);color:var(--blue)">✍️</div>
+        <div>
+          <div class="card-title">Engagement Crafter Agent</div>
+          <div class="card-sub"><span class="pill p-blue">Claude 3 Haiku</span> — fast content generation</div>
+        </div>
+      </div>
+      <p><strong>Goal:</strong> Produce ready-to-send outreach across email, SMS, and push — personalised to the specific signals, tone calibrated to risk level.</p>
+      <br>
+      <p><strong>Tools:</strong> <code>get_channel_preferences</code> · <code>get_brand_voice</code></p>
+      <br>
+      <p><strong>Autonomy decisions:</strong><br>• Chooses channel priority (CRITICAL = SMS first, not email)<br>• Names the specific support issue in the message<br>• Adapts tone: urgent for HIGH, warmer for MEDIUM</p>
+      <br>
+      <p><strong style="color:var(--blue)">Feedback loop:</strong> If the offer description exceeds SMS char limit, it asks the Offer Strategist to simplify before drafting.</p>
+      <br>
+      <p><strong>Output:</strong> 3-channel outreach drafts → Orchestrator final assembly</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════ SCORING -->
+<section id="scoring">
+  <div class="sec-label">Scoring Engine</div>
+  <h2>Algorithmic Composite Score — No LLM, Free</h2>
+  <p class="sub">Runs on every customer. Six signals are normalised to a 0-100 risk scale, weighted by predictive power, and summed. Score &gt; 50 triggers the agent pipeline.</p>
+
+  <div class="card-grid cg2">
+    <div class="card">
+      <h3>Signal Weights & Example</h3>
+      <div style="margin-top:.5rem" id="scoring-bars"></div>
+      <div style="margin-top:1.25rem;padding:1rem;background:var(--s2);border-radius:8px;font-size:.78rem">
+        <div style="font-weight:700;margin-bottom:.5rem;color:var(--amb)">Example: Jane Doe (APEX-00291847)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;font-size:.72rem;color:var(--mu)">
+          <div>Signal</div><div style="text-align:right">Norm.</div><div style="text-align:right">Weighted</div>
+          <div style="color:var(--tx)">GA session −57%</div><div style="text-align:right;color:var(--red)">84</div><div style="text-align:right;color:var(--red)">12.6</div>
+          <div style="color:var(--tx)">AOV −30%, disc 0.6</div><div style="text-align:right;color:var(--red)">72</div><div style="text-align:right;color:var(--red)">18.0</div>
+          <div style="color:var(--tx)">Zero redemptions</div><div style="text-align:right;color:var(--red)">100</div><div style="text-align:right;color:var(--red)">15.0</div>
+          <div style="color:var(--tx)">Email open 14%</div><div style="text-align:right;color:var(--amb)">67</div><div style="text-align:right;color:var(--amb)">6.7</div>
+          <div style="color:var(--tx)">Ticket 6d open</div><div style="text-align:right;color:var(--red)">73</div><div style="text-align:right;color:var(--red)">10.95</div>
+          <div style="color:var(--tx)">CRM 72 (misleading)</div><div style="text-align:right;color:var(--mu)">28</div><div style="text-align:right;color:var(--mu)">5.6</div>
+        </div>
+        <div style="border-top:1px solid var(--bd);margin-top:.5rem;padding-top:.5rem;display:flex;justify-content:space-between">
+          <span style="font-weight:700">Composite Score</span>
+          <span style="color:var(--red);font-weight:800;font-size:1rem">68.85 → HIGH</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Risk Classification</h3>
+      <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:.5rem">
+        <div style="background:rgba(240,80,96,.08);border:1px solid rgba(240,80,96,.25);border-radius:8px;padding:.85rem">
+          <div style="font-weight:700;color:var(--red);font-size:.88rem">CRITICAL &nbsp;≥ 85</div>
+          <div style="font-size:.78rem;color:var(--mu);margin-top:.25rem">Personal DRI call required. Automated campaigns will not work. High-cost intervention: tier upgrade + personal outreach + service recovery.</div>
+        </div>
+        <div style="background:rgba(240,80,96,.05);border:1px solid rgba(240,80,96,.2);border-radius:8px;padding:.85rem">
+          <div style="font-weight:700;color:var(--red);font-size:.88rem">HIGH &nbsp;50–84</div>
+          <div style="font-size:.78rem;color:var(--mu);margin-top:.25rem">Agent pipeline triggered. Personalized multi-signal offer. Approval required. 4-signal alignment typical.</div>
+        </div>
+        <div style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:.85rem">
+          <div style="font-weight:700;color:var(--amb);font-size:.88rem">MEDIUM &nbsp;30–49</div>
+          <div style="font-size:.78rem;color:var(--mu);margin-top:.25rem">Monitor mode. Loyalty nudge via Klaviyo sequence. No agent invoked. Re-score in 7 days.</div>
+        </div>
+        <div style="background:rgba(38,201,158,.05);border:1px solid rgba(38,201,158,.15);border-radius:8px;padding:.85rem">
+          <div style="font-weight:700;color:var(--teal);font-size:.88rem">LOW &nbsp;&lt; 30</div>
+          <div style="font-size:.78rem;color:var(--mu);margin-top:.25rem">No action. Score logged. Scheduled recalc every 48 hours.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════ COST -->
+<section id="cost">
+  <div class="sec-label">Cost Optimisation</div>
+  <h2>Multi-Model Routing — 71% Cost Savings</h2>
+  <p class="sub">Complex reasoning tasks route to Sonnet. Content generation and data collection route to Haiku. Same output quality, dramatically lower cost.</p>
+
+  <div class="cost-compare">
+    <div class="cost-col">
+      <div class="cost-model" style="color:var(--pur)">Claude 3.5 Sonnet</div>
+      <div class="cost-price">$3 input / $15 output per M tokens · Complex reasoning</div>
+      <div class="call-list">
+        <div class="call-item" style="background:rgba(240,80,96,.08)">
+          <div class="call-icon" style="background:rgba(240,80,96,.15);color:var(--red)">🔬</div>
+          <div><div style="font-weight:700">Conflict Detector</div><div style="font-size:.72rem;color:var(--mu)">CRM vs GA cross-check, temporal gap analysis</div></div>
+        </div>
+        <div class="call-item" style="background:rgba(168,85,247,.08)">
+          <div class="call-icon" style="background:rgba(168,85,247,.15);color:var(--pur)">💡</div>
+          <div><div style="font-weight:700">Offer Strategist</div><div style="font-size:.72rem;color:var(--mu)">Offer design, margin check, escalation decision</div></div>
+        </div>
+        <div class="call-item" style="background:rgba(168,85,247,.08)">
+          <div class="call-icon" style="background:rgba(168,85,247,.15);color:var(--pur)">📋</div>
+          <div><div style="font-weight:700">Retention Brief</div><div style="font-size:.72rem;color:var(--mu)">Structured, cited brief for CRM manager</div></div>
+        </div>
+      </div>
+      <div style="margin-top:.75rem;font-size:.78rem;color:var(--mu)">3 calls · ~$0.42 per customer</div>
+    </div>
+    <div class="cost-col">
+      <div class="cost-model" style="color:var(--blue)">Claude 3 Haiku</div>
+      <div class="cost-price">$0.25 input / $1.25 output per M tokens · Fast content</div>
+      <div class="call-list">
+        <div class="call-item" style="background:rgba(38,201,158,.08)">
+          <div class="call-icon" style="background:rgba(38,201,158,.15);color:var(--teal)">🔍</div>
+          <div><div style="font-weight:700">Signal Collector</div><div style="font-size:.72rem;color:var(--mu)">Query 6 systems, structure signals</div></div>
+        </div>
+        <div class="call-item" style="background:rgba(77,142,245,.08)">
+          <div class="call-icon" style="background:rgba(77,142,245,.15);color:var(--blue)">✉️</div>
+          <div><div style="font-weight:700">Email Draft</div><div style="font-size:.72rem;color:var(--mu)">Personalized email from brand voice + signals</div></div>
+        </div>
+        <div class="call-item" style="background:rgba(77,142,245,.08)">
+          <div class="call-icon" style="background:rgba(77,142,245,.15);color:var(--blue)">📱</div>
+          <div><div style="font-weight:700">SMS Draft</div><div style="font-size:.72rem;color:var(--mu)">≤160 char, channel-first</div></div>
+        </div>
+        <div class="call-item" style="background:rgba(77,142,245,.08)">
+          <div class="call-icon" style="background:rgba(77,142,245,.15);color:var(--blue)">🔔</div>
+          <div><div style="font-weight:700">Push Notification</div><div style="font-size:.72rem;color:var(--mu)">Title ≤50 + body ≤100 chars</div></div>
+        </div>
+      </div>
+      <div style="margin-top:.75rem;font-size:.78rem;color:var(--mu)">4 calls · ~$0.03 per customer</div>
+    </div>
+  </div>
+
+  <div class="savings-bar">
+    <div class="sbar-label">Cost per customer: optimized routing vs all-Sonnet baseline</div>
+    <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--mu);margin-bottom:.25rem">
+      <span>Optimized: $0.45</span><span>All-Sonnet baseline: $1.55</span>
+    </div>
+    <div class="sbar-track">
+      <div class="sbar-seg" style="width:29%;background:linear-gradient(90deg,var(--teal),var(--blue))">$0.45</div>
+      <div class="sbar-seg" style="width:71%;background:rgba(255,255,255,.04);color:var(--mu)">71% saved → $1.10/customer</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem;font-size:.78rem">
+      <div style="text-align:center">
+        <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">71%</div>
+        <div style="color:var(--mu)">Cost savings per customer</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1.4rem;font-weight:800;color:var(--blue)">$11,000</div>
+        <div style="color:var(--mu)">Monthly saving at 10K at-risk/day</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1.4rem;font-weight:800;color:var(--pur)">$132K</div>
+        <div style="color:var(--mu)">Annual saving vs all-Sonnet</div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════ MCP -->
+<section id="mcp">
+  <div class="sec-label">MCP Server</div>
+  <h2>Model Context Protocol — Open Agent Interface</h2>
+  <p class="sub">The retention tools are exposed via MCP so any AI agent — Claude Desktop, Kiro IDE, or custom agents — can query customer data and run the pipeline without direct API integration.</p>
+
+  <div class="mcp-grid">
+    <div class="mcp-source-systems">
+      <div style="font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);font-weight:700;margin-bottom:.5rem">Exposed Tools</div>
+      <div class="mcp-consumer" style="border-color:var(--bd)"><span style="color:var(--blue)">⚙</span> query_crm(customer_id)</div>
+      <div class="mcp-consumer" style="border-color:var(--bd)"><span style="color:var(--blue)">⚙</span> query_shopify(customer_id)</div>
+      <div class="mcp-consumer" style="border-color:var(--bd)"><span style="color:var(--blue)">⚙</span> query_yotpo(customer_id)</div>
+      <div class="mcp-consumer" style="border-color:var(--bd)"><span style="color:var(--blue)">⚙</span> query_klaviyo(customer_id)</div>
+      <div class="mcp-consumer" style="border-color:var(--bd)"><span style="color:var(--blue)">⚙</span> query_zendesk(customer_id)</div>
+      <div class="mcp-consumer" style="border-color:var(--bd)"><span style="color:var(--blue)">⚙</span> compute_score(signals)</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem">
+      <div style="width:2px;flex:1;background:linear-gradient(to bottom,var(--pur),var(--blue))"></div>
+      <div style="font-size:.72rem;font-weight:700;color:var(--pur);text-transform:uppercase;letter-spacing:.08em;writing-mode:vertical-rl;transform:rotate(180deg)">MCP Protocol</div>
+      <div style="width:2px;flex:1;background:linear-gradient(to bottom,var(--blue),var(--pur))"></div>
+    </div>
+
+    <div class="mcp-consumers">
+      <div style="font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);font-weight:700;margin-bottom:.5rem">Consumers</div>
+      <div class="mcp-consumer" style="border-color:rgba(168,85,247,.4)">
+        <span style="font-size:1.1rem">🖥</span>
+        <div><div style="font-weight:700;color:var(--pur)">Claude Desktop</div><div style="font-size:.72rem;color:var(--mu)">Direct customer queries in chat</div></div>
+      </div>
+      <div class="mcp-consumer" style="border-color:rgba(77,142,245,.4)">
+        <span style="font-size:1.1rem">🔧</span>
+        <div><div style="font-weight:700;color:var(--blue)">Kiro IDE</div><div style="font-size:.72rem;color:var(--mu)">Agent-assisted CRM workflows</div></div>
+      </div>
+      <div class="mcp-consumer" style="border-color:rgba(38,201,158,.4)">
+        <span style="font-size:1.1rem">🤖</span>
+        <div><div style="font-weight:700;color:var(--teal)">Custom Agents</div><div style="font-size:.72rem;color:var(--mu)">Any MCP-compatible AI client</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════ SIGNAL CONFLICTS -->
+<section id="flow">
+  <div class="sec-label">The Core Problem</div>
+  <h2>System Conflicts — Why the CRM is Wrong</h2>
+  <p class="sub">Five of six systems signal imminent churn. The CRM says the customer is healthy. Without a composite view, the wrong offer fires — or nothing fires at all.</p>
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>Confirmed Fact</th><th>Source</th><th>Conflicting System</th><th>The Gap</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sessions dropped 60% in 30 days</td>
+          <td><span class="pill p-blue">Google Analytics</span></td>
+          <td><span class="pill p-red">Salesforce CRM</span></td>
+          <td>CRM scores customer 72/100 healthy — uses purchase recency only, ignores behavioral intent</td>
+        </tr>
+        <tr>
+          <td>Zero redemptions in 8 weeks</td>
+          <td><span class="pill p-teal">Yotpo</span></td>
+          <td><span class="pill p-amb">Shopify</span></td>
+          <td>Loyalty engine not tracking points-to-order conversion; generic 10% voucher sent</td>
+        </tr>
+        <tr>
+          <td>Unresolved ticket open 6 days</td>
+          <td><span class="pill p-red">Zendesk</span></td>
+          <td><span class="pill p-teal">Yotpo</span> + <span class="pill p-pur">Klaviyo</span></td>
+          <td>Loyalty engine and email platform unaware; reward email sent mid-open ticket</td>
+        </tr>
+        <tr>
+          <td>14 campaigns sent, 8.2% open rate</td>
+          <td><span class="pill p-pur">Klaviyo</span></td>
+          <td><span class="pill p-blue">Salesforce CRM</span></td>
+          <td>CRM sees "campaign sent = action taken"; doesn't track disengagement. Campaigns continue unchanged.</td>
+        </tr>
+        <tr>
+          <td>AOV declined 34%; 3/5 orders used discount</td>
+          <td><span class="pill p-amb">Shopify</span></td>
+          <td><span class="pill p-teal">Yotpo</span></td>
+          <td>Loyalty offer sent: generic 10% voucher — same as non-discount-dependent customers. Reinforces discount dependency.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════ IMPACT -->
+<section id="impact">
+  <div class="sec-label">Business Impact</div>
+  <h2>Before vs. After</h2>
+  <p class="sub">Manual workflow vs. AI agent pipeline — same signals, radically different speed and personalisation.</p>
+  <div class="ba-grid">
+    <div class="ba-col ba-before">
+      <span class="ba-header">Before — Manual Workflow</span>
+      <div class="ba-row"><span class="ba-metric">Annual churn rate</span><span class="ba-val" style="color:var(--red)">28%</span></div>
+      <div class="ba-row"><span class="ba-metric">Campaign launch time</span><span class="ba-val" style="color:var(--red)">4–7 days</span></div>
+      <div class="ba-row"><span class="ba-metric">Analyst hours / segment</span><span class="ba-val" style="color:var(--red)">4–8 hrs</span></div>
+      <div class="ba-row"><span class="ba-metric">Offer personalisation</span><span class="ba-val" style="color:var(--red)">~8%</span></div>
+      <div class="ba-row"><span class="ba-metric">Loyalty redemption rate</span><span class="ba-val" style="color:var(--red)">0%</span></div>
+      <div class="ba-row"><span class="ba-metric">Churn signal lead time</span><span class="ba-val" style="color:var(--red)">0 days (reactive)</span></div>
+      <div class="ba-row"><span class="ba-metric">Audit trail completeness</span><span class="ba-val" style="color:var(--red)">0%</span></div>
+      <div class="ba-row"><span class="ba-metric">Revenue attribution</span><span class="ba-val" style="color:var(--red)">$0 tracked</span></div>
+    </div>
+    <div class="ba-col ba-after">
+      <span class="ba-header">After — AI Agent Pipeline</span>
+      <div class="ba-row"><span class="ba-metric">Annual churn rate</span><span class="ba-val" style="color:var(--teal)">&lt; 14% (−50%)</span></div>
+      <div class="ba-row"><span class="ba-metric">Campaign launch time</span><span class="ba-val" style="color:var(--teal)">47 seconds (−99%)</span></div>
+      <div class="ba-row"><span class="ba-metric">Analyst hours / segment</span><span class="ba-val" style="color:var(--teal)">&lt; 5 min (−97%)</span></div>
+      <div class="ba-row"><span class="ba-metric">Offer personalisation</span><span class="ba-val" style="color:var(--teal)">&gt; 85% (10×)</span></div>
+      <div class="ba-row"><span class="ba-metric">Loyalty redemption rate</span><span class="ba-val" style="color:var(--teal)">&gt; 35% (structural)</span></div>
+      <div class="ba-row"><span class="ba-metric">Churn signal lead time</span><span class="ba-val" style="color:var(--teal)">+14 days (proactive)</span></div>
+      <div class="ba-row"><span class="ba-metric">Audit trail completeness</span><span class="ba-val" style="color:var(--teal)">100% (structural)</span></div>
+      <div class="ba-row"><span class="ba-metric">Revenue attribution</span><span class="ba-val" style="color:var(--teal)">$4.2M annualised</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:2.5rem">
+    <h3>30 / 60 / 90 Day Roadmap</h3>
+    <div class="timeline" style="margin-top:1.25rem">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">30 Days</div>
+        <div class="tl-title">Pilot — 10,000 Customers</div>
+        <div class="tl-body">Real-time GA + Shopify event streams connected to composite scorer. Pilot runs in parallel with manual process. Validate &lt;2-min launch with real integrations. Identify DRI + CRM analyst as pilot users.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">60 Days</div>
+        <div class="tl-title">Expand — 5 Segments + A/B Framework</div>
+        <div class="tl-body">Add Zendesk ticket signal. Expand to 5 retention segments + loyalty tier triggers. A/B test framework: agent offer vs. control. Measure redemption lift, churn delta, revenue attributed.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">90 Days</div>
+        <div class="tl-title">Production — All 2.1M Customers</div>
+        <div class="tl-body">Production deployment. Loyalty engine rule: zero-redemption at 4 weeks triggers auto-intervention. Role-tailored outputs (CRM / loyalty / finance / exec). Full ROI model: $2.1M platform cost vs. revenue protected.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Apex Retail Multi-Agent Retention Architecture · RDE Bootcamp Case Study · Architecture aligned to architecture-diagrams.md
+</footer>
+
+<script>
+// Tab switcher
+function switchTab(group, name) {
+  const panels = document.querySelectorAll(`#arch-tabs ~ .tab-panel`);
+  const tabs = document.querySelectorAll(`#arch-tabs .tab`);
+  panels.forEach(p => p.classList.remove('on'));
+  tabs.forEach(t => t.classList.remove('on'));
+  document.getElementById(`arch-${name}`).classList.add('on');
+  event.target.classList.add('on');
+}
+
+// Scoring bars
+const signals = [
+  { label:'GA Session Decline',       weight:0.15, norm:84, color:'#f05060' },
+  { label:'Transaction Risk (AOV)',   weight:0.25, norm:72, color:'#f05060' },
+  { label:'Loyalty Inactivity',       weight:0.15, norm:100,color:'#f05060' },
+  { label:'Email Disengagement',      weight:0.10, norm:67, color:'#f5a623' },
+  { label:'Support Sentiment',        weight:0.15, norm:73, color:'#f05060' },
+  { label:'CRM Engagement (inverse)', weight:0.20, norm:28, color:'#7080a0' },
+];
+const sb = document.getElementById('scoring-bars');
+signals.forEach(s => {
+  sb.innerHTML += `
+  <div class="sig-bar-wrap">
+    <span class="sig-label">${s.label}</span>
+    <div class="sig-bar-bg">
+      <div class="sig-bar-fill" style="width:${s.norm}%;background:${s.color}" data-w="${s.norm}"></div>
+    </div>
+    <span class="sig-weight" style="color:${s.color}">×${s.weight}</span>
+    <span class="sig-score">${(s.norm*s.weight).toFixed(1)} pts</span>
+  </div>`;
+});
+
+// Sequence rows
+const steps = [
+  {actor:'Trigger', col:1, msg:'GA session −60% (Customer #1042)'},
+  {actor:'Scoring', col:2, msg:'Normalize → Weight → Classify'},
+  {actor:'Scoring', col:2, msg:'Score: 69 (HIGH) — threshold crossed'},
+  {actor:'Orchestrator', col:3, msg:'Fan-out: parallel launch of 3 agents'},
+  {actor:'Signal Col.', col:4, msg:'query_crm → query_shopify → ... (6 systems)'},
+  {actor:'Signal Col.', col:4, msg:'"CRM 72 vs GA −60% — flagging conflict"'},
+  {actor:'Conflict Det.', col:5, msg:'4/6 systems confirm churn. CRM is lagging.'},
+  {actor:'Conflict Det.', col:5, msg:'Score adjusted: 69 → 91 (CRITICAL)'},
+  {actor:'Offer Strat.', col:6, msg:'Tier: Gold. Prior: 2× 10% (ignored). Signal: service issue.'},
+  {actor:'Offer Strat.', col:6, msg:'"Double-points + service recovery + personal outreach"'},
+  {actor:'Engage Craft.', col:7, msg:'"CRITICAL = SMS first. Name the support issue."'},
+  {actor:'Engage Craft.', col:7, msg:'SMS + Email + Push drafts (47 seconds total)'},
+  {actor:'Orchestrator', col:3, msg:'Package assembled → Dashboard'},
+];
+const colColors = ['','var(--blue)','var(--blue)','var(--pur)','var(--teal)','var(--red)','var(--pur)','var(--blue)'];
+const sr = document.getElementById('seq-rows');
+steps.forEach((step,i) => {
+  const cells = Array.from({length:7},(_,c)=>{
+    if(c+1===step.col) return `<div style="display:flex;align-items:center;padding:.4rem"><div style="background:var(--s2);border:1px solid var(--bd2);border-radius:5px;padding:.3rem .55rem;font-size:.72rem;color:${colColors[step.col]};white-space:nowrap">${step.msg}</div></div>`;
+    return '';
+  });
+  sr.innerHTML+=`<div style="display:grid;grid-template-columns:130px repeat(7,1fr);min-width:900px;border-bottom:1px solid var(--bd)">
+    <div style="padding:.4rem .6rem;font-size:.68rem;color:var(--mu);display:flex;align-items:center;border-right:1px solid var(--bd)">${step.actor}</div>
+    ${cells.join('')}
+  </div>`;
+});
+
+// Animate scoring bars on scroll
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll('.sig-bar-fill').forEach(el=>{
+        el.style.width = el.dataset.w + '%';
+      });
+    }
+  });
+},{threshold:.2});
+const scoringSection = document.getElementById('scoring');
+if(scoringSection) obs.observe(scoringSection);
+
+// Init bars at 0
+document.querySelectorAll('.sig-bar-fill').forEach(el=>{
+  const w = el.style.width;
+  el.style.width='0%';
+  el.dataset.w = parseInt(w);
+});
+</script>
+</body>
+</html>

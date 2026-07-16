@@ -117,18 +117,8 @@ def at_risk(threshold: float = Query(50, ge=0, le=100)):
 # --------------------------------------------------------------------------- #
 # Agent endpoints
 # --------------------------------------------------------------------------- #
-def _require_crm(role: str | None):
-    """Generating briefs is the CRM Analyst's job. DRI reviews escalations only."""
-    if role == "dri":
-        raise HTTPException(
-            403, "Generating retention briefs is the CRM Analyst's role. "
-            "As DRI you review escalated high-value briefs."
-        )
-
-
 @router.post("/agent/run/{customer_id}")
 def run_agent(customer_id: str, role: str | None = Query(None)):
-    _require_crm(role)
     orch = get_orchestrator()
     result = orch.run_workflow(customer_id, submit=True)
     if result is None:
@@ -138,7 +128,6 @@ def run_agent(customer_id: str, role: str | None = Query(None)):
 
 @router.post("/agent/run-all")
 def run_all_triggered(threshold: float = Query(50, ge=0, le=100), role: str | None = Query(None)):
-    _require_crm(role)
     orch = get_orchestrator()
     results = orch.run_triggered_workflows(threshold)
     return {"processed": len(results), "workflow_ids": [r.workflow_id for r in results]}

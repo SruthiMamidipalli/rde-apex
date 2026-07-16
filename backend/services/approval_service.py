@@ -100,9 +100,12 @@ class ApprovalService:
     class RoleError(Exception):
         """Raised when a persona tries to approve a brief outside its authority."""
 
-    def _authorized_role(self, pending: PendingApproval) -> str:
-        """Which role may approve this brief: escalated → DRI, else CRM analyst."""
-        return "dri" if pending.escalated else "crm"
+    def _can_approve(self, pending: PendingApproval, role: str | None) -> bool:
+        """DRI is the higher authority and may approve anything. CRM may approve
+        only standard (non-escalated) briefs; escalated ones need DRI sign-off."""
+        if role is None or role == "dri":
+            return True
+        return not pending.escalated
 
     def approve(
         self,
@@ -112,20 +115,15 @@ class ApprovalService:
         role: str | None = None,
     ) -> ApprovalDecision:
         pending = self._require(approval_id)
-        # Two-tier authority: escalated (high-value/CRITICAL) briefs are the DRI's
-        # to approve; standard briefs are the CRM analyst's. Enforce when a role
-        # is supplied (the API always supplies one).
-        required = self._authorized_role(pending)
-        if role is not None and role != required:
-            raise self.RoleError(
-                f"This brief requires {'DRI' if required == 'dri' else 'CRM Analyst'} "
-                f"approval."
-            )
+        # Two-tier authority: escalated (high-value/CRITICAL) briefs require DRI
+        # sign-off; the CRM analyst can approve standard briefs directly.
+        if not self._can_approve(pending, role):
+            raise self.RoleError("This high-value brief requires DRI sign-off.")
         approver = approver.strip() if approver and approver.strip() else "unknown"
         status = ApprovalStatus.OVERRIDDEN if modifications else ApprovalStatus.APPROVED
         pending.status = status
         pending.approved_by = approver
-        pending.approver_role = role or required
+        pending.approver_role = role or ("dri" if pending.escalated else "crm")
         decision = ApprovalDecision(
             approval_id=approval_id,
             customer_id=pending.workflow_result.customer_id,

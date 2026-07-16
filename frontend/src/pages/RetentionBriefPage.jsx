@@ -76,9 +76,10 @@ function Brief({ id, name, showToast }) {
   const [approval, setApproval] = useState(null);
 
   const approvalId = approval?.approval_id || null;
-  // Who may approve THIS brief: escalated → DRI, else CRM.
-  const requiredRole = approval?.escalated ? "dri" : "crm";
-  const canApprove = approval && persona === requiredRole;
+  // DRI is the higher authority: can approve anything. CRM can approve only
+  // non-escalated (standard) briefs; escalated ones require DRI sign-off.
+  const canApprove = approval && (persona === "dri" || !approval.escalated);
+  const requiredRole = "dri";
 
   async function load() {
     setLoading(true);
@@ -142,18 +143,6 @@ function Brief({ id, name, showToast }) {
   if (loading) return <Spinner label="Loading brief…" />;
 
   if (!wf) {
-    // Only the CRM Analyst generates briefs; the DRI reviews escalations.
-    if (persona === "dri") {
-      return (
-        <div className="panel flex flex-col items-center justify-center gap-2 p-10 text-center">
-          <div className="text-[13px] font-semibold">No brief awaiting your approval for {name}.</div>
-          <div className="text-[12px] text-apex-muted">
-            The CRM Analyst generates retention briefs. High-value ones are
-            escalated here for your sign-off.
-          </div>
-        </div>
-      );
-    }
     return (
       <div className="panel flex flex-col items-center justify-center gap-3 p-10 text-center">
         <div className="text-[13px] text-apex-muted">

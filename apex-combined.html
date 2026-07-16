@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex — Loyalty Intelligence</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ══════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════ */
+.screen { display:none; }
+.screen.active { display:flex; }
+
+/* ══════════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════════ */
+#screen-login {
+  min-height:100dvh; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#c84b9e 0%,#7b52c8 40%,#3a5fd4 70%,#0d0d2b 100%);
+  font-family:-apple-system,'Segoe UI',sans-serif; padding:24px;
+}
+.login-card {
+  display:grid; grid-template-columns:1fr 1fr;
+  width:100%; max-width:960px; min-height:580px;
+  border-radius:20px; overflow:hidden;
+  border:1.5px solid rgba(255,255,255,0.22);
+  box-shadow:0 32px 80px rgba(0,0,0,0.40);
+}
+.hero {
+  position:relative; padding:32px;
+  display:flex; flex-direction:column; justify-content:space-between;
+  overflow:hidden;
+  background:linear-gradient(160deg,#c84b9e 0%,#9b4fc4 20%,#6a4ec8 40%,#3a5fd4 62%,#1a1a6e 80%,#080820 100%);
+}
+.hero-sheen {
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 120% 60% at 20% 30%,rgba(200,75,158,0.55) 0%,transparent 60%),
+    radial-gradient(ellipse 100% 50% at 80% 20%,rgba(106,78,200,0.45) 0%,transparent 55%),
+    radial-gradient(ellipse 90% 70% at 50% 80%,rgba(10,10,80,0.70) 0%,transparent 60%);
+}
+.hero-eyebrow {
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:12px;
+  font-size:10px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase;
+  color:rgba(255,255,255,0.55);
+}
+.hero-eyebrow::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.18); }
+.hero-bottom { position:relative; z-index:1; }
+.hero-title {
+  font-family:Georgia,serif; font-size:52px; font-weight:700; line-height:1.05;
+  color:#fff; margin-bottom:16px; letter-spacing:-0.02em;
+}
+.hero-sub { font-size:13px; color:rgba(255,255,255,0.52); line-height:1.65; max-width:280px; }
+.auth {
+  background:#fff;
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+  padding:48px 52px;
+}
+.auth-logo-row { display:flex; align-items:center; gap:8px; margin-bottom:40px; }
+.auth-logo-box {
+  width:28px; height:28px; border-radius:7px;
+  background:linear-gradient(135deg,#c84b9e,#6a4ec8);
+  display:flex; align-items:center; justify-content:center;
+}
+.auth-logo-name { font-size:17px; font-weight:700; color:#111; letter-spacing:-0.025em; }
+.auth-title { font-family:Georgia,serif; font-size:32px; font-weight:700; color:#111; letter-spacing:-0.02em; margin-bottom:6px; }
+.auth-sub { font-size:13px; color:#9ca3af; margin-bottom:28px; }
+.persona-list { display:flex; flex-direction:column; gap:12px; width:100%; margin-bottom:24px; }
+.persona-btn {
+  width:100%; text-align:left; padding:16px 18px; border-radius:12px;
+  border:1.5px solid #e5e7eb; background:#fff; cursor:pointer;
+  display:flex; align-items:center; gap:14px;
+  transition:border-color 0.15s,background 0.15s,box-shadow 0.15s; outline:none;
+}
+.persona-btn.active { border:2px solid #7745e6; background:rgba(119,69,230,0.05); box-shadow:0 0 0 3px rgba(119,69,230,0.12); }
+.persona-icon { line-height:1; flex-shrink:0; color:#9ca3af; }
+.persona-btn.active .persona-icon { color:#7745e6; }
+.persona-title { font-size:14px; font-weight:600; color:#111; margin-bottom:2px; }
+.persona-btn.active .persona-title { color:#7745e6; }
+.persona-sub { font-size:12px; color:#9ca3af; line-height:1.45; }
+.persona-dot {
+  margin-left:auto; width:18px; height:18px; border-radius:50%;
+  border:1.5px solid #d1d5db; background:transparent; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; transition:all 0.15s;
+}
+.persona-btn.active .persona-dot { border:2px solid #7745e6; background:#7745e6; }
+.sso-btn {
+  width:100%; background:#0a0a0a; color:#fff; border:none; border-radius:10px;
+  padding:14px; font-size:15px; font-weight:500; cursor:pointer; margin-bottom:12px;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  letter-spacing:0.01em; transition:background 0.15s; outline:none;
+}
+.sso-btn:hover { background:#2a2a2a; }
+.auth-footer { font-size:13px; color:#6b7280; text-align:center; width:100%; margin-top:12px; }
+.auth-footer a { color:#111; font-weight:600; text-decoration:none; }
+
+/* ══════════════════════════════════════════
+   OVERVIEW SCREEN
+══════════════════════════════════════════ */
+#screen-overview {
+  height:100vh; overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:#111;
+  background:#f3f4f6;
+}
+
+/* Sidebar */
+.sidebar {
+  width:224px; flex-shrink:0; background:#fff;
+  display:flex; flex-direction:column; min-height:100vh;
+  border-right:1px solid #e5e7eb; position:relative; z-index:20;
+}
+.sidebar-top { display:flex; align-items:center; justify-content:space-between; padding:22px 14px 14px; flex-shrink:0; }
+.logo-wrap { display:flex; align-items:center; gap:9px; }
+.logo-box { width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,#c84b9e,#6a4ec8); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.logo-name { font-size:15px; font-weight:600; color:#111; letter-spacing:-0.02em; }
+.logo-sub  { font-size:10px; color:#9ca3af; font-weight:500; }
+.toggle-btn { width:26px; height:26px; border-radius:7px; background:#f3f4f6; border:1px solid #e5e7eb; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#9ca3af; flex-shrink:0; }
+.divider { height:1px; background:#f3f4f6; margin:0 14px 10px; }
+.nav { flex:1; padding:0 8px; overflow-y:auto; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; color:#6b7280; font-size:13.5px; cursor:pointer; margin-bottom:2px; position:relative; text-decoration:none; transition:background 0.12s,color 0.12s; }
+.nav-item:hover { background:#f9fafb; color:#111; }
+.nav-item.active { background:rgba(119,69,230,0.08); color:#7745e6; font-weight:500; }
+.nav-item.active::before { content:''; position:absolute; left:-8px; top:50%; transform:translateY(-50%); width:3px; height:60%; border-radius:0 3px 3px 0; background:linear-gradient(180deg,#c84b9e,#6a4ec8); }
+.nav-icon { flex-shrink:0; opacity:0.65; width:16px; height:16px; }
+.nav-item.active .nav-icon { opacity:1; }
+.nav-badge { font-size:10px; font-weight:600; color:#fff; background:linear-gradient(135deg,#c84b9e,#6a4ec8); padding:2px 7px; border-radius:20px; margin-left:auto; }
+.nav-badge-count { font-size:10px; font-weight:700; color:#fff; background:#FF3B30; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-left:auto; }
+.sidebar-bottom { flex-shrink:0; padding:10px 8px 18px; border-top:1px solid #e5e7eb; }
+.conn-row { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; cursor:pointer; color:#9ca3af; font-size:11px; }
+.user-row { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; cursor:pointer; margin-top:4px; }
+.user-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#c84b9e,#6a4ec8); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.user-name { font-size:13px; font-weight:500; color:#111; }
+.user-role { font-size:11px; font-weight:500; background:linear-gradient(90deg,#c84b9e,#6a4ec8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+/* Main */
+.main { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+.topbar { height:60px; background:#fff; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; padding:0 28px; gap:14px; flex-shrink:0; }
+.search-pill { flex:1; max-width:360px; display:flex; align-items:center; gap:8px; background:#f3f4f6; border-radius:10px; padding:9px 14px; font-size:13.5px; color:#9ca3af; }
+.topbar-right { display:flex; align-items:center; gap:10px; margin-left:auto; }
+.icon-btn { width:36px; height:36px; border-radius:9px; border:none; background:#f3f4f6; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#6b7280; }
+.topbar-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#c84b9e,#6a4ec8); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; }
+.content { flex:1; overflow-y:auto; padding:24px; }
+.space-y > * + * { margin-top:16px; }
+
+/* AI Banner */
+.ai-banner { display:grid; grid-template-columns:1fr 1fr; background:#fffbeb; border-radius:14px; border:1px solid #fde68a; border-left:4px solid #f59e0b; overflow:hidden; }
+.ai-left  { padding:20px 22px; border-right:1px solid #fde68a; }
+.ai-right { padding:20px 22px; display:flex; flex-direction:column; justify-content:space-between; }
+.ai-eyebrow { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.ai-label  { font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#92400e; }
+.ai-conf   { font-size:11px; font-weight:600; color:#92400e; background:rgba(245,158,11,0.18); padding:2px 8px; border-radius:20px; }
+.ai-stream { font-size:12.5px; color:#374151; line-height:1.75; min-height:120px; font-family:'SF Mono',Menlo,monospace; }
+.kpi-line  { display:block; opacity:0; transform:translateY(4px); transition:opacity 0.3s,transform 0.3s; }
+.kpi-line.visible { opacity:1; transform:translateY(0); }
+.good { color:#10b981; } .warn { color:#f59e0b; } .bad { color:#ef4444; }
+.cursor { display:inline-block; width:8px; height:14px; background:#f59e0b; border-radius:2px; animation:blink 1s step-end infinite; vertical-align:middle; margin-left:2px; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.ai-rec-text { font-size:13.5px; font-weight:500; color:#111; line-height:1.55; margin-bottom:8px; }
+.ai-evidence { font-size:11px; color:#78716c; margin-bottom:14px; }
+.ai-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.btn-primary   { font-size:12px; font-weight:600; color:#fff; background:#10b981; border:none; border-radius:8px; padding:7px 16px; cursor:pointer; }
+.btn-secondary { font-size:12px; font-weight:500; color:#374151; background:#fff; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; cursor:pointer; }
+.btn-ghost     { font-size:12px; font-weight:500; color:#9ca3af; background:transparent; border:1px solid #e5e7eb; border-radius:8px; padding:7px 14px; cursor:pointer; }
+
+/* Metric grid */
+.metric-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.metric-card { background:#fff; border-radius:14px; border:1px solid #e5e7eb; padding:18px 20px; display:flex; flex-direction:column; gap:6px; }
+.metric-label { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#9ca3af; }
+.metric-value { font-size:28px; font-weight:700; letter-spacing:-0.02em; line-height:1; font-variant-numeric:tabular-nums; }
+.metric-row { display:flex; align-items:center; justify-content:space-between; }
+.metric-target { font-size:11px; color:#9ca3af; }
+.metric-delta  { font-size:11px; font-weight:500; }
+.metric-bar-track { height:5px; background:#f3f4f6; border-radius:99px; overflow:hidden; }
+.metric-bar-fill  { height:100%; border-radius:99px; }
+.metric-source { font-size:10px; color:#9ca3af; display:flex; align-items:center; gap:5px; margin-top:2px; }
+.metric-dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex-shrink:0; }
+
+/* Revenue at risk */
+.rev-card { background:#fff; border-radius:14px; border:1px solid #e5e7eb; padding:20px 24px; display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+.rev-label { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#9ca3af; margin-bottom:4px; }
+.rev-value { font-size:32px; font-weight:700; color:#ef4444; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
+.rev-divider { height:44px; width:1px; background:#f3f4f6; flex-shrink:0; }
+.rev-stat-val { font-size:17px; font-weight:700; color:#111; font-variant-numeric:tabular-nums; }
+.rev-stat-sub { font-size:11px; color:#9ca3af; margin-top:2px; }
+.band-dots { margin-left:auto; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.band-dot-item { display:flex; align-items:center; gap:5px; }
+.band-dot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
+.band-dot-label { font-size:12px; font-weight:600; color:#374151; }
+.band-dot-count { font-size:17px; font-weight:700; color:#111; min-width:18px; font-variant-numeric:tabular-nums; }
+
+/* Churn chart */
+.churn-card { background:#fff; border-radius:14px; border:1px solid #e5e7eb; padding:22px 24px; }
+.churn-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; }
+.churn-title { font-size:15px; font-weight:600; color:#111; margin-bottom:2px; }
+.churn-sub   { font-size:12px; color:#9ca3af; }
+.churn-stat-val { font-size:22px; font-weight:700; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; text-align:right; }
+.churn-stat-sub { font-size:11px; color:#9ca3af; }
+.churn-footer { display:flex; justify-content:space-between; margin-top:10px; }
+
+/* Bottom grid */
+.bottom-grid { display:grid; grid-template-columns:1fr 300px; gap:14px; align-items:start; }
+.signals-card { background:#fff; border-radius:14px; border:1px solid #e5e7eb; overflow:hidden; }
+.signals-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; border-bottom:1px solid #f3f4f6; }
+.signals-title { font-size:14px; font-weight:600; color:#111; }
+.live-badge { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:#ef4444; letter-spacing:0.06em; }
+.live-dot { width:6px; height:6px; border-radius:50%; background:#ef4444; animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+.signal-row { display:flex; align-items:center; gap:12px; padding:12px 20px; border:none; background:transparent; cursor:pointer; text-align:left; width:100%; border-bottom:1px solid #f9fafb; transition:background 0.12s; }
+.signal-row:last-child { border-bottom:none; }
+.signal-row:hover { background:#f9fafb; }
+.signal-avatar { width:28px; height:28px; border-radius:50%; background:#f3f4f6; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:9px; font-weight:700; color:#374151; }
+.signal-name { font-size:13px; color:#111; line-height:1.4; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.signal-chips { display:flex; gap:5px; margin-top:5px; }
+.chip { font-size:10px; font-weight:600; letter-spacing:0.03em; padding:2px 7px; border-radius:5px; }
+.chip-grey { color:#374151; background:#f3f4f6; }
+.signal-score { font-size:18px; font-weight:700; min-width:36px; text-align:right; font-variant-numeric:tabular-nums; flex-shrink:0; }
+.pending-card { background:#fff; border-radius:14px; border:1px solid #e5e7eb; padding:18px 20px; }
+.pending-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.pending-title  { font-size:14px; font-weight:600; color:#111; }
+.pending-badge  { font-size:11px; font-weight:600; color:#9ca3af; background:#f9fafb; padding:2px 9px; border-radius:20px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-card">
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-sheen"></div>
+      <div class="hero-eyebrow">Apex Intelligence</div>
+      <div class="hero-bottom">
+        <h1 class="hero-title">Retain<br>Every<br>Customer</h1>
+        <p class="hero-sub">AI-powered retention intelligence — surface risk, act fast, and save every relationship that matters.</p>
+      </div>
+    </div>
+    <!-- Auth panel -->
+    <div class="auth">
+      <div class="auth-logo-row">
+        <div class="auth-logo-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8 17L12 7L16 17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 14H14.5" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </div>
+        <span class="auth-logo-name">APEX</span>
+      </div>
+      <h2 class="auth-title">Welcome, Sarah</h2>
+      <p class="auth-sub">Select your role to continue</p>
+      <div class="persona-list">
+        <button class="persona-btn active" onclick="selectPersona(this)">
+          <span class="persona-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+          <div>
+            <div class="persona-title">CRM Analyst</div>
+            <div class="persona-sub">Manage retention queue, review AI offers, and track customer health</div>
+          </div>
+          <div class="persona-dot"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3L3 5L7 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </button>
+        <button class="persona-btn" onclick="selectPersona(this)">
+          <span class="persona-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <div>
+            <div class="persona-title">Decision Owner (DRI)</div>
+            <div class="persona-sub">Approve high-value interventions and monitor business outcomes</div>
+          </div>
+          <div class="persona-dot"></div>
+        </button>
+      </div>
+      <button class="sso-btn" onclick="goToOverview()">
+        <svg width="18" height="18" viewBox="0 0 21 21" fill="none"><rect x="1" y="1" width="9" height="9" fill="#F25022"/><rect x="11" y="1" width="9" height="9" fill="#7FBA00"/><rect x="1" y="11" width="9" height="9" fill="#00A4EF"/><rect x="11" y="11" width="9" height="9" fill="#FFB900"/></svg>
+        Sign in with SSO
+      </button>
+      <p class="auth-footer">Don't have an account? <a href="#">Sign Up</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     OVERVIEW SCREEN
+══════════════════════════════════════ -->
+<div id="screen-overview" class="screen">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo-wrap">
+        <div class="logo-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 17L12 7L16 17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 14H14.5" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        <div><div class="logo-name">Apex</div><div class="logo-sub">Loyalty</div></div>
+      </div>
+      <div class="toggle-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    </div>
+    <div class="divider"></div>
+    <nav class="nav">
+      <a class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Overview <span class="nav-badge-count">6</span>
+      </a>
+      <a class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytical View
+      </a>
+      <a class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Customer 360
+      </a>
+      <a class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Audit & Reports
+      </a>
+      <a class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Agent Hub <span class="nav-badge">LIVE</span>
+      </a>
+      <a class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Case Study
+      </a>
+      <a class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Developer API
+      </a>
+      <a class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M20 12h-2M4 12H2M17.66 17.66l-1.41-1.41M6.34 17.66l1.41-1.41M12 20v-2M12 4V2"/></svg>
+        Settings
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="conn-row">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>1 source degraded</span>
+      </div>
+      <div class="user-row">
+        <div class="user-avatar">SJ</div>
+        <div><div class="user-name">Sarah Johnson</div><div class="user-role">CRM Analyst</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="topbar">
+      <div class="search-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Search customers or decisions...
+        <kbd style="margin-left:auto;font-size:11px;background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:5px;color:#9ca3af;font-family:monospace;">⌘K</kbd>
+      </div>
+      <div class="topbar-right">
+        <div style="position:relative;">
+          <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div style="position:absolute;top:8px;right:8px;width:7px;height:7px;background:#c84b9e;border-radius:50%;border:1.5px solid #fff;"></div>
+        </div>
+        <div class="topbar-avatar">SJ</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="space-y">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
+          <div>
+            <div style="font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#9ca3af;margin-bottom:4px;">Wednesday, July 16</div>
+            <h1 style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#111;letter-spacing:-0.02em;">Good afternoon, Sarah.</h1>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-top:8px;">
+            <span style="font-size:11px;color:#9ca3af;white-space:nowrap;">5/6 healthy · last sync just now</span>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+              <span style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#9ca3af;">Connectors</span>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px;"><span style="width:6px;height:6px;border-radius:50%;background:#30D158;display:inline-block;"></span>Salesforce</span>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px;"><span style="width:6px;height:6px;border-radius:50%;background:#30D158;display:inline-block;"></span>Shopify</span>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px;"><span style="width:6px;height:6px;border-radius:50%;background:#30D158;display:inline-block;"></span>Yotpo</span>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px;"><span style="width:6px;height:6px;border-radius:50%;background:#FF9500;display:inline-block;"></span>Klaviyo</span>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px;"><span style="width:6px;height:6px;border-radius:50%;background:#30D158;display:inline-block;"></span>Zendesk</span>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px;"><span style="width:6px;height:6px;border-radius:50%;background:#30D158;display:inline-block;"></span>GA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Banner -->
+        <div class="ai-banner">
+          <div class="ai-left">
+            <div class="ai-eyebrow">
+              <span class="ai-label">AI KPI Summary</span>
+              <span class="ai-conf" id="conf-badge">Generating...</span>
+            </div>
+            <div class="ai-stream" id="ai-stream">
+              <span class="kpi-line" id="l0">Analysing 22 customers across 6 CRM sources...</span>
+              <span class="kpi-line" id="l1"><span class="bad">●</span> Composite churn score: <strong>87/100</strong> — CRITICAL spike in Loyalty Tier 2</span>
+              <span class="kpi-line" id="l2"><span class="bad">●</span> Annual churn rate: <strong>23.1%</strong> — 9.1pt above 14% target ↑</span>
+              <span class="kpi-line" id="l3"><span class="bad">●</span> Revenue at risk: <strong>$7.4M</strong> — 6 CRITICAL, 7 HIGH, 6 MED, 3 LOW</span>
+              <span class="kpi-line" id="l4"><span class="good">●</span> Redemption rate: <strong>50.0%</strong> — 15pt above 35% target ✓</span>
+              <span class="kpi-line" id="l5"><span class="good">●</span> Avg campaign launch: <strong>2.0 min</strong> — at target ✓</span>
+              <span class="kpi-line" id="l6"><span class="warn">●</span> Offer personalisation: <strong>79%</strong> — 6pt below 85% target</span>
+              <span class="kpi-line" id="l7"><span class="bad">●</span> CRM divergence: <strong>+32pt</strong> — Salesforce underestimating risk</span>
+              <span class="kpi-line" id="l8"><span class="warn">●</span> Signal coverage: <strong>83%</strong> — Klaviyo 15 min lag detected</span>
+              <span class="cursor" id="cursor"></span>
+            </div>
+          </div>
+          <div class="ai-right">
+            <div>
+              <div class="ai-eyebrow" style="margin-bottom:10px;">
+                <div style="width:32px;height:32px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:11px;font-weight:700;color:#fff;">AI</span></div>
+                <span class="ai-label">Recommendation</span>
+                <span class="ai-conf">Confidence 88</span>
+              </div>
+              <p class="ai-rec-text">Churn-risk spike in Loyalty Tier 2 — <strong>13 customers</strong> at HIGH+ risk. Session-collapse pattern matches the prior churn cohort. Work the At-Risk Queue by risk × value first.</p>
+              <p class="ai-evidence">Evidence: Sessions −60% [GA] · Zero redemptions [Yotpo] · Unresolved tickets [Zendesk]</p>
+            </div>
+            <div class="ai-actions">
+              <button class="btn-primary">Go to At-Risk Queue</button>
+              <button class="btn-secondary">Modify</button>
+              <button class="btn-ghost">Dismiss</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Metric cards -->
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="metric-label">Annual Churn Rate</div>
+            <div class="metric-value" style="color:#ef4444;">23.1%</div>
+            <div class="metric-row"><span class="metric-target">Target 14.0%</span><span class="metric-delta" style="color:#10b981;">↓ 4.9 vs 28</span></div>
+            <div class="metric-bar-track"><div class="metric-bar-fill" style="width:42%;background:#ef4444;"></div></div>
+            <div class="metric-source"><span class="metric-dot" style="background:#ef4444;"></span>Shopify + CRM</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Redemption Rate</div>
+            <div class="metric-value" style="color:#10b981;">50.0%</div>
+            <div class="metric-row"><span class="metric-target">Target 35.0%</span><span class="metric-delta" style="color:#10b981;">↑ 50.0 vs 0</span></div>
+            <div class="metric-bar-track"><div class="metric-bar-fill" style="width:100%;background:#10b981;"></div></div>
+            <div class="metric-source"><span class="metric-dot" style="background:#10b981;"></span>Yotpo</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Offer Personalisation</div>
+            <div class="metric-value" style="color:#f59e0b;">79%</div>
+            <div class="metric-row"><span class="metric-target">Target 85.0%</span><span class="metric-delta" style="color:#ef4444;">↓ −6pt</span></div>
+            <div class="metric-bar-track"><div class="metric-bar-fill" style="width:79%;background:#f59e0b;"></div></div>
+            <div class="metric-source"><span class="metric-dot" style="background:#f59e0b;"></span>AI Brief Engine</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Avg Campaign Launch</div>
+            <div class="metric-value" style="color:#10b981;">2.0<span style="font-size:16px;font-weight:500;color:#9ca3af;">min</span></div>
+            <div class="metric-row"><span class="metric-target">Target &lt;3 min</span><span class="metric-delta" style="color:#10b981;">↓ 1 min ✓</span></div>
+            <div class="metric-bar-track"><div class="metric-bar-fill" style="width:67%;background:#10b981;"></div></div>
+            <div class="metric-source"><span class="metric-dot" style="background:#10b981;"></span>Klaviyo + CRM</div>
+          </div>
+        </div>
+
+        <!-- Revenue at risk -->
+        <div class="rev-card">
+          <div>
+            <div class="rev-label">Revenue at Risk</div>
+            <div class="rev-value">$7.4M</div>
+          </div>
+          <div class="rev-divider"></div>
+          <div><div class="rev-stat-val">$0</div><div class="rev-stat-sub">Secured this week</div></div>
+          <div class="rev-divider"></div>
+          <div><div class="rev-stat-val">$620K</div><div class="rev-stat-sub">Avg LTV at risk</div></div>
+          <div class="band-dots">
+            <div class="band-dot-item"><span class="band-dot" style="background:#FF3B30;"></span><span class="band-dot-label">CRITICAL</span><span class="band-dot-count">6</span></div>
+            <div class="band-dot-item"><span class="band-dot" style="background:#FF9500;"></span><span class="band-dot-label">HIGH</span><span class="band-dot-count">7</span></div>
+            <div class="band-dot-item"><span class="band-dot" style="background:#FFCC00;"></span><span class="band-dot-label">MED</span><span class="band-dot-count">6</span></div>
+            <div class="band-dot-item"><span class="band-dot" style="background:#30D158;"></span><span class="band-dot-label">LOW</span><span class="band-dot-count">3</span></div>
+          </div>
+        </div>
+
+        <!-- Churn trend full width -->
+        <div class="churn-card">
+          <div class="churn-header">
+            <div>
+              <div class="churn-title">Churn Rate — 90d Trend</div>
+              <div class="churn-sub">Rolling 90-day annual churn rate across all active customers</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="churn-stat-val" style="color:#ef4444;">23.1%</div>
+              <div class="churn-stat-sub">current · +9.1pt vs target</div>
+            </div>
+          </div>
+          <svg width="100%" height="140" viewBox="0 0 800 140" preserveAspectRatio="none" id="churn-svg">
+            <!-- Grid lines -->
+            <line x1="0" y1="28"  x2="800" y2="28"  stroke="#f3f4f6" stroke-width="1"/>
+            <line x1="0" y1="56"  x2="800" y2="56"  stroke="#f3f4f6" stroke-width="1"/>
+            <line x1="0" y1="84"  x2="800" y2="84"  stroke="#f3f4f6" stroke-width="1"/>
+            <line x1="0" y1="112" x2="800" y2="112" stroke="#f3f4f6" stroke-width="1"/>
+            <!-- Target line -->
+            <line x1="0" y1="95" x2="800" y2="95" stroke="#10b981" stroke-width="1" stroke-dasharray="5,4" opacity="0.5"/>
+            <text x="6" y="90" font-size="9" fill="#10b981" font-family="sans-serif" opacity="0.7">14% target</text>
+            <!-- Area fill -->
+            <path d="M0,112 L44,108 L89,105 L133,102 L178,98 L222,95 L267,93 L311,90 L356,87 L400,84 L444,80 L489,75 L533,70 L578,65 L622,60 L667,55 L711,50 L756,46 L800,43 L800,140 L0,140 Z" fill="rgba(239,68,68,0.08)"/>
+            <!-- Line -->
+            <polyline points="0,112 44,108 89,105 133,102 178,98 222,95 267,93 311,90 356,87 400,84 444,80 489,75 533,70 578,65 622,60 667,55 711,50 756,46 800,43" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- End dot -->
+            <circle cx="800" cy="43" r="4" fill="#ef4444"/>
+            <text x="772" y="36" font-size="10" fill="#ef4444" font-family="sans-serif" font-weight="700">23.1%</text>
+            <!-- Y labels -->
+            <text x="2" y="27"  font-size="9" fill="#9ca3af" font-family="sans-serif">30%</text>
+            <text x="2" y="55"  font-size="9" fill="#9ca3af" font-family="sans-serif">25%</text>
+            <text x="2" y="83"  font-size="9" fill="#9ca3af" font-family="sans-serif">20%</text>
+            <text x="2" y="111" font-size="9" fill="#9ca3af" font-family="sans-serif">15%</text>
+          </svg>
+          <div class="churn-footer">
+            <span style="font-size:11px;color:#9ca3af;">Apr 16</span>
+            <span style="font-size:11px;color:#9ca3af;">Jul 16</span>
+          </div>
+        </div>
+
+        <!-- Bottom grid -->
+        <div class="bottom-grid">
+          <!-- Signals -->
+          <div class="signals-card">
+            <div class="signals-header">
+              <span class="signals-title">Signals Firing Now</span>
+              <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+            </div>
+            <div id="signal-list"></div>
+          </div>
+          <!-- Pending -->
+          <div class="pending-card">
+            <div class="pending-header">
+              <span class="pending-title">Pending Approval</span>
+              <span class="pending-badge">3 offers</span>
+            </div>
+            <div id="pending-list"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Screen switch ──
+function selectPersona(btn) {
+  document.querySelectorAll('.persona-btn').forEach(b => {
+    b.classList.remove('active');
+    b.querySelector('.persona-dot').innerHTML = '';
+  });
+  btn.classList.add('active');
+  btn.querySelector('.persona-dot').innerHTML = '<svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3L3 5L7 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+function goToOverview() {
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-overview').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  startKPIStream();
+}
+
+// ── KPI typewriter stream ──
+function startKPIStream() {
+  const lines = document.querySelectorAll('.kpi-line');
+  const cursor = document.getElementById('cursor');
+  const badge  = document.getElementById('conf-badge');
+  let i = 0;
+  function showNext() {
+    if (i < lines.length) {
+      lines[i].classList.add('visible');
+      i++;
+      setTimeout(showNext, 380);
+    } else {
+      cursor.style.display = 'none';
+      badge.textContent = 'Confidence 88';
+    }
+  }
+  setTimeout(showNext, 600);
+}
+
+// ── Signals data ──
+const signals = [
+  { name:'Marcus Chen',    initials:'MC', score:85, band:'CRITICAL', color:'#FF3B30', signals:['Sessions −62%','No redemption 90d'] },
+  { name:'Priya Nair',     initials:'PN', score:83, band:'CRITICAL', color:'#FF3B30', signals:['Support ticket open','Drop 3 tiers'] },
+  { name:'David Okafor',   initials:'DO', score:81, band:'CRITICAL', color:'#FF3B30', signals:['Email 0 opens 60d','LTV mismatch'] },
+  { name:'Elena Volkova',  initials:'EV', score:78, band:'CRITICAL', color:'#FF3B30', signals:['Purchase gap 75d','CRM diverge +30'] },
+  { name:'James Sullivan', initials:'JS', score:74, band:'HIGH',     color:'#FF9500', signals:['Loyalty lapsed','Sessions −40%'] },
+  { name:'Carlos Mendez',  initials:'CM', score:69, band:'HIGH',     color:'#FF9500', signals:['No engagement 45d','Refund requested'] },
+  { name:'Aiko Tanaka',    initials:'AT', score:65, band:'HIGH',     color:'#FF9500', signals:['Tier downgrade risk','Sentiment drop'] },
+  { name:'Ravi Sharma',    initials:'RS', score:61, band:'HIGH',     color:'#FF9500', signals:['60d no purchase','Review −ve'] },
+];
+const list = document.getElementById('signal-list');
+signals.forEach(s => {
+  list.innerHTML += `<button class="signal-row">
+    <div class="signal-avatar" style="background:${s.color}18;color:${s.color};">${s.initials}</div>
+    <div style="flex:1;min-width:0;">
+      <div class="signal-name">${s.name}</div>
+      <div class="signal-chips">
+        ${s.signals.map(t => `<span class="chip chip-grey">${t}</span>`).join('')}
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div class="signal-score" style="color:${s.color};">${s.score}</div>
+      <div style="font-size:10px;font-weight:700;color:${s.color};letter-spacing:0.04em;">${s.band}</div>
+    </div>
+  </button>`;
+});
+
+// ── Pending approvals ──
+const pending = [
+  { name:'Marcus Chen',  offer:'10% Loyalty Bonus',   val:'$42',  over:true  },
+  { name:'Priya Nair',   offer:'Free Premium Item',    val:'$38',  over:false },
+  { name:'David Okafor', offer:'50 Bonus Points',      val:'$28',  over:false },
+];
+const plist = document.getElementById('pending-list');
+pending.forEach(p => {
+  plist.innerHTML += `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #f9fafb;">
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:13px;font-weight:500;color:#111;">${p.name}</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:2px;">${p.offer}</div>
+      ${p.over ? '<div style="font-size:10px;font-weight:600;color:#ef4444;margin-top:3px;">Over spend limit</div>' : ''}
+    </div>
+    <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px;">
+      <button style="font-size:11px;font-weight:600;color:#fff;background:#10b981;border:none;border-radius:7px;padding:5px 10px;cursor:pointer;">Approve</button>
+      <button style="font-size:11px;font-weight:500;color:#6b7280;background:#f3f4f6;border:none;border-radius:7px;padding:5px 8px;cursor:pointer;">Deny</button>
+    </div>
+  </div>`;
+});
+</script>
+</body>
+</html>
